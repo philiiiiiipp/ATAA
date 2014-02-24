@@ -1,0 +1,1 @@
+java -enableassertions -jar ..\system\libraries\rl-viz\EnvironmentShell.jar environment-jar-path=..\system\environmentJars

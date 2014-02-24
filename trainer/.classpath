@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="D:/Dev/ATAA/lib/RLGlueCodec.jar"/>
-	<classpathentry kind="lib" path="D:/Dev/ATAA/lib/RLVizLib.jar"/>
+	<classpathentry kind="lib" path="lib/RLGlueCodec.jar"/>
+	<classpathentry kind="lib" path="lib/RLVizLib.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

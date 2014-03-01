@@ -1,4 +1,4 @@
-package nl.uva.agent.genetic;
+package nl.uva.ataa.agent.genetic;
 
 import java.util.ArrayList;
 import java.util.List;

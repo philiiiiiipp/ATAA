@@ -1,4 +1,4 @@
-package nl.uva.agent.genetic;
+package nl.uva.ataa.agent.genetic;
 
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;

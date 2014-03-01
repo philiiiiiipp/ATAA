@@ -1,4 +1,4 @@
-package nl.uva.agent.utilities;
+package nl.uva.ataa.agent.utilities;
 
 import java.util.Random;
 

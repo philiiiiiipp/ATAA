@@ -1,6 +1,6 @@
-package nl.uva.agent.genetic;
+package nl.uva.ataa.agent.genetic;
 
-import nl.uva.agent.utilities.Utilities;
+import nl.uva.ataa.agent.utilities.Utilities;
 
 import org.jgap.BaseGene;
 import org.jgap.Configuration;

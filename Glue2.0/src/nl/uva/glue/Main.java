@@ -29,7 +29,7 @@ public class Main {
 		// should be in [0,39] //0 is standard acrobot
 		// consoleTrainerHelper.loadMario(0,0,0,0);
 
-		RLGlue.RL_init();
+		// RLGlue.RL_init();
 
 		int episodeCount = 10; // number of episodes to run
 		int maxEpisodeLength = 20000; // set a maxEpisodeLength to cut off long

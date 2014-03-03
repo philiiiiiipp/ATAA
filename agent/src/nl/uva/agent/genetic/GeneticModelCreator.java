@@ -65,7 +65,7 @@ public class GeneticModelCreator {
 			gaConf.setSampleChromosome(sampleChromosome);
 			gaConf.setPopulationSize(populationSize);
 
-			// Set a fitness fcuntion!
+			// Set a fitness function!
 			// gaConf.setFitnessFunction(new EvaluateModel(mStates, mActions,
 			// river));
 

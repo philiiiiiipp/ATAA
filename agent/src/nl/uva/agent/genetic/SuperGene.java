@@ -142,28 +142,8 @@ public class SuperGene extends BaseGene implements Gene, java.io.Serializable {
 			final String a_representation)
 			throws UnsupportedOperationException,
 			UnsupportedRepresentationException {
-		// We're expecting to find the maximum number of quarters that this
-		// Gene can represent, followed by a colon, followed by the actual
-		// number of quarters currently represented.
-		// -----------------------------------------------------------------
-		// StringTokenizer tokenizer = new StringTokenizer(a_representation,
-		// TOKEN_SEPARATOR);
-		// Make sure there are exactly two tokens.
-		// ---------------------------------------
-		// if (tokenizer.countTokens() != 2) {
 		throw new UnsupportedRepresentationException(
 				"Unknown representation format: Two tokens expected.");
-		// }
-		//
-		// try {
-		// // Parse the two tokens as integers.
-		// // ---------------------------------
-		// m_maxNumberOfQuarters = Integer.parseInt(tokenizer.nextToken());
-		// m_numberOfQuarters = new Integer(tokenizer.nextToken());
-		// } catch (NumberFormatException e) {
-		// throw new
-		// UnsupportedRepresentationException("Unknown representation format: Expecting integer values.");
-		// }
 	}
 
 	/**
@@ -172,8 +152,7 @@ public class SuperGene extends BaseGene implements Gene, java.io.Serializable {
 	 */
 	@Override
 	public void cleanup() {
-		// There's no cleanup necessary for this implementation.
-		// -----------------------------------------------------
+
 	}
 
 	/**

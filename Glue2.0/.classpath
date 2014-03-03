@@ -7,5 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/HelicopterTrainer"/>
 	<classpathentry kind="lib" path="lib/RLGlueCodec.jar"/>
 	<classpathentry kind="lib" path="lib/RLVizLib.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/HelicopterEvolver"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

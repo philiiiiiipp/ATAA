@@ -14,7 +14,6 @@ public class AgentEvolver {
     public AgentEvolver(final int poolSize) {
         mPoolSize = poolSize;
         for (int i = 0; i < mPoolSize; i++) {
-            mAgents.add(new NeuroEvolutionaryAgent());
         }
     }
 

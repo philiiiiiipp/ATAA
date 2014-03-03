@@ -5,11 +5,9 @@ import java.util.List;
 
 import nl.uva.ataa.environment.EvolutionaryEnvironment;
 
-import org.rlcommunity.environment.helicopter.Helicopter;
-
 public class EnvironmentEvolver {
 
-    private final List<Helicopter> mEnvironments = new ArrayList<>();
+    private final List<EvolutionaryEnvironment> mEnvironments = new ArrayList<>();
     private final int mPoolSize;
 
     public EnvironmentEvolver(final int poolSize) {
@@ -19,11 +17,11 @@ public class EnvironmentEvolver {
         }
     }
 
-    public void evolveEnvironments(List<Double> rewards) {
+    public void evolveEnvironments() {
         // TODO
     }
 
-    public List<Helicopter> getEnvironments() {
+    public List<EvolutionaryEnvironment> getEnvironments() {
         return mEnvironments;
     }
 

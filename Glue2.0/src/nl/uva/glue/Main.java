@@ -1,6 +1,6 @@
 package nl.uva.glue;
 
-import nl.uva.agent.RandomAgent;
+import nl.uva.ataa.agent.RandomAgent;
 
 import org.rlcommunity.environment.helicopter.generalized.GeneralizedHelicopter;
 import org.rlcommunity.rlglue.codec.AgentInterface;

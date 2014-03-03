@@ -50,7 +50,7 @@ public class GeneticModelCreator {
 	 */
 	private Genotype initialiseGenotype(final int populationSize,
 			final int geneNumber) {
-
+		// dont need gene nr - nr of weights in neural network is fixed
 		Configuration.reset();
 		Configuration gaConf = new DefaultConfiguration();
 		gaConf.setPreservFittestIndividual(true);
@@ -61,9 +61,11 @@ public class GeneticModelCreator {
 			IChromosome sampleChromosome = new Chromosome(gaConf,
 					new SuperGene(gaConf), geneNumber);
 
-			gaConf.setAlwaysCaculateFitness(true);
+			gaConf.setAlwaysCaculateFitness(true);  //is this needed ?
 			gaConf.setSampleChromosome(sampleChromosome);
-			gaConf.setPopulationSize(populationSize);
+			// how many chromosomes have in one gene pool/iteration?
+			// keep the same nr of chromosomes
+			gaConf.setPopulationSize(populationSize); 
 
 			// Set a fitness function!
 			// gaConf.setFitnessFunction(new EvaluateModel(mStates, mActions,

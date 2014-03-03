@@ -61,18 +61,18 @@ public class GeneticModelCreator {
 			IChromosome sampleChromosome = new Chromosome(gaConf,
 					new SuperGene(gaConf), geneNumber);
 
-			gaConf.setAlwaysCaculateFitness(true);  //is this needed ?
+			gaConf.setAlwaysCaculateFitness(true); // is this needed ?
 			gaConf.setSampleChromosome(sampleChromosome);
 			// how many chromosomes have in one gene pool/iteration?
 			// keep the same nr of chromosomes
-			gaConf.setPopulationSize(populationSize); 
+			gaConf.setPopulationSize(populationSize);
 
 			// Set a fitness function!
 			// gaConf.setFitnessFunction(new EvaluateModel(mStates, mActions,
 			// river));
 
 			genotype = Genotype.randomInitialGenotype(gaConf);
-
+			genotype.evolve();
 		} catch (InvalidConfigurationException e) {
 			e.printStackTrace();
 		}

@@ -219,6 +219,7 @@ public class SuperGene extends BaseGene implements Gene, java.io.Serializable {
 
 	@Override
 	public void applyMutation(final int a_index, final double a_percentage) {
+		// randomly change gene up to a % threshold
 		int maxMutation = (int) (101 * Math.abs(a_percentage));
 
 		if (maxMutation == 0)

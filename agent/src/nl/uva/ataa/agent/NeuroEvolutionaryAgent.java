@@ -1,5 +1,9 @@
 package nl.uva.ataa.agent;
 
+import org.jgap.Configuration;
+import org.jgap.Gene;
+import org.jgap.IGeneConstraintChecker;
+import org.jgap.InvalidConfigurationException;
 import org.neuroph.core.input.InputFunction;
 import org.neuroph.core.transfer.TransferFunction;
 import org.rlcommunity.rlglue.codec.util.AgentLoader;
@@ -73,5 +77,162 @@ public class NeuroEvolutionaryAgent extends NeuralNetworkAgent {
     public static void main(final String[] args) {
         new AgentLoader(new NeuroEvolutionaryAgent()).run();
     }
+
+	@Override
+	public Gene getGene(int a_desiredLocus) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Gene[] getGenes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setGenes(Gene[] a_genes) throws InvalidConfigurationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int size() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setFitnessValue(double a_newFitnessValue) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setFitnessValueDirectly(double a_newFitnessValue) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public double getFitnessValue() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getFitnessValueDirectly() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setIsSelectedForNextGeneration(boolean a_isSelected) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isSelectedForNextGeneration() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setConstraintChecker(IGeneConstraintChecker a_constraintChecker)
+			throws InvalidConfigurationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setApplicationData(Object a_newData) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Object getApplicationData() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void cleanup() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Configuration getConfiguration() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void increaseAge() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void resetAge() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setAge(int a_age) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getAge() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void increaseOperatedOn() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void resetOperatedOn() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int operatedOn() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int compareTo(Object o) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public String getUniqueID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setUniqueIDTemplate(String a_templateID, int a_index) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getUniqueIDTemplate(int a_index) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

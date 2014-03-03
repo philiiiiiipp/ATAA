@@ -1,5 +1,6 @@
 package nl.uva.ataa.agent;
 
+import org.jgap.IChromosome;
 import org.neuroph.core.Layer;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.Neuron;
@@ -10,7 +11,7 @@ import org.rlcommunity.rlglue.codec.AgentInterface;
 import org.rlcommunity.rlglue.codec.types.Action;
 import org.rlcommunity.rlglue.codec.types.Observation;
 
-public abstract class NeuralNetworkAgent implements AgentInterface {
+public abstract class NeuralNetworkAgent implements AgentInterface, IChromosome {
 
     /** The neural network used to map observations to actions */
     protected final NeuralNetwork<?> mNeuralNetwork = new NeuralNetwork<>();
@@ -175,5 +176,12 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     public Action agent_step(final double reward, final Observation o) {
         return getAction(o);
     }
+	
+	@Override
+	public Object clone(){
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
+

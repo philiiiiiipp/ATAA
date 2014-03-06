@@ -1,6 +1,10 @@
 package nl.uva.ataa.agent;
 
+import java.util.List;
+
 import nl.uva.ataa.agent.genetic.SuperGene;
+import nl.uva.ataa.environment.EvolutionaryEnvironment;
+import nl.uva.glue.EpisodeRunner;
 
 import org.jgap.IChromosome;
 import org.neuroph.core.Layer;
@@ -18,11 +22,15 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     /** The neural network used to map observations to actions */
     protected final NeuralNetwork<?> mNeuralNetwork = new NeuralNetwork<>();
 
+    protected List<EvolutionaryEnvironment> mEnvironments;
+
     /** The nr of episodes run during tests */
     private int mNrEpisodes = 0;
 
     /** The rewards that the agent has gathered during tests */
     private double mAccumulatedReward = 0.0;
+
+    private Double mCachedFitness = null;
 
     public NeuralNetworkAgent() {
         buildNeuralNetwork();
@@ -240,13 +248,26 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
      * @return The agent's fitness
      */
     public double getFitness() {
-        return mAccumulatedReward / mNrEpisodes;
+        if (mCachedFitness == null) {
+            for (final EvolutionaryEnvironment environment : mEnvironments) {
+                agent_init(environment.env_init());
+
+                EpisodeRunner.run(environment, this);
+
+                mAccumulatedReward -= environment.getMinimimReward();
+            }
+
+            mCachedFitness = mAccumulatedReward / mNrEpisodes;
+        }
+
+        return mCachedFitness;
     }
 
     @Override
     public void agent_cleanup() {
         mAccumulatedReward = 0.0;
         mNrEpisodes = 0;
+        mCachedFitness = null;
     }
 
     @Override
@@ -272,4 +293,9 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     public void agent_end(final double reward) {
         mAccumulatedReward += reward;
     }
+
+    public void setEnvironments(final List<EvolutionaryEnvironment> list) {
+        mEnvironments = list;
+    }
+
 }

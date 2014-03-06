@@ -43,7 +43,7 @@ public class EnvironmentEvolver {
             final Population population = genotype.getPopulation();
             for (int i = 0; i < genotype.getPopulation().size(); ++i) {
                 IChromosome chromosome = population.getChromosome(i);
-                WindGene[] genes = (WindGene[]) chromosome.getGenes();
+                WindGene[] genes = Arrays.copyOf(chromosome.getGenes(), chromosome.getGenes().length, WindGene[].class);
 
                 WindGene[] windNS = Arrays.copyOfRange(genes, 0, 4);
                 WindGene[] windEW = Arrays.copyOfRange(genes, 4, 8);

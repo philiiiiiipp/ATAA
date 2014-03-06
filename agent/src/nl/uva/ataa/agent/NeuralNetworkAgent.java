@@ -2,7 +2,7 @@ package nl.uva.ataa.agent;
 
 import java.util.List;
 
-import nl.uva.ataa.agent.genetic.SuperGene;
+import nl.uva.ataa.agent.genetic.gene.NeuralNetworkGene;
 import nl.uva.ataa.environment.EvolutionaryEnvironment;
 import nl.uva.glue.EpisodeRunner;
 
@@ -199,7 +199,7 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
         final double[] weights = new double[chromosome.getGenes().length];
 
         for (int i = 0; i < chromosome.getGenes().length; ++i) {
-            final SuperGene superGene = (SuperGene) chromosome.getGene(i);
+            final NeuralNetworkGene superGene = (NeuralNetworkGene) chromosome.getGene(i);
             weights[i] = superGene.doubleValue();
         }
 

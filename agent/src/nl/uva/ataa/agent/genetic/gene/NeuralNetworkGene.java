@@ -1,4 +1,4 @@
-package nl.uva.ataa.agent.genetic;
+package nl.uva.ataa.agent.genetic.gene;
 
 import nl.uva.ataa.agent.utilities.Utilities;
 
@@ -9,7 +9,7 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
 import org.jgap.UnsupportedRepresentationException;
 
-public class SuperGene extends BaseGene implements Gene, java.io.Serializable {
+public class NeuralNetworkGene extends BaseGene implements Gene, java.io.Serializable {
 
 	/**
 	 * 
@@ -21,7 +21,7 @@ public class SuperGene extends BaseGene implements Gene, java.io.Serializable {
 	 * Constructs a new QuarterGene with no maximum number of quarters that can
 	 * be represented (other than Integer.MAX_VALUE, of course).
 	 */
-	public SuperGene(final Configuration a_conf)
+	public NeuralNetworkGene(final Configuration a_conf)
 			throws InvalidConfigurationException {
 		super(a_conf);
 	}
@@ -44,12 +44,12 @@ public class SuperGene extends BaseGene implements Gene, java.io.Serializable {
 	 *         this concrete Gene.
 	 */
 	@Override
-	public SuperGene newGeneInternal() {
+	public NeuralNetworkGene newGeneInternal() {
 		try {
 			// We construct the new QuarterGene with the same maximum number
 			// of quarters that this Gene was constructed with.
 			// -------------------------------------------------------------
-			return new SuperGene(getConfiguration());
+			return new NeuralNetworkGene(getConfiguration());
 		} catch (InvalidConfigurationException ex) {
 			throw new IllegalStateException(ex.getMessage());
 		}
@@ -183,7 +183,7 @@ public class SuperGene extends BaseGene implements Gene, java.io.Serializable {
 		}
 
 		return mGeneValue
-				.compareTo(((SuperGene) a_otherQuarterGene).mGeneValue);
+				.compareTo(((NeuralNetworkGene) a_otherQuarterGene).mGeneValue);
 	}
 
 	/**
@@ -194,7 +194,7 @@ public class SuperGene extends BaseGene implements Gene, java.io.Serializable {
 	 */
 	@Override
 	public boolean equals(final Object otherQuarterGene) {
-		return otherQuarterGene instanceof SuperGene
+		return otherQuarterGene instanceof NeuralNetworkGene
 				&& compareTo(otherQuarterGene) == 0;
 	}
 

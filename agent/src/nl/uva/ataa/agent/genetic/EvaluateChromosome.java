@@ -16,6 +16,6 @@ public class EvaluateChromosome extends FitnessFunction {
 
     @Override
     protected double evaluate(final IChromosome chromosome) {
-        return chromosome.getFitnessValueDirectly();
+        return 0;
     }
 }

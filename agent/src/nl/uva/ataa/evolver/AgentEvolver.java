@@ -6,7 +6,7 @@ import java.util.List;
 import nl.uva.ataa.agent.NeuralNetworkAgent;
 import nl.uva.ataa.agent.NeuroEvolutionaryAgent;
 import nl.uva.ataa.agent.genetic.EvaluateChromosome;
-import nl.uva.ataa.agent.genetic.SuperGene;
+import nl.uva.ataa.agent.genetic.gene.NeuralNetworkGene;
 
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
@@ -38,7 +38,7 @@ public class AgentEvolver {
                 mAgents.add(nAgent);
             }
 
-            final IChromosome sampleChromosome = new Chromosome(gaConf, new SuperGene(gaConf), mAgents.get(0)
+            final IChromosome sampleChromosome = new Chromosome(gaConf, new NeuralNetworkGene(gaConf), mAgents.get(0)
                     .getWeights().length);
 
             gaConf.setSampleChromosome(sampleChromosome);

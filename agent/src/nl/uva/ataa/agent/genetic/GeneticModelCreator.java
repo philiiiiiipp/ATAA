@@ -3,6 +3,8 @@ package nl.uva.ataa.agent.genetic;
 import java.util.ArrayList;
 import java.util.List;
 
+import nl.uva.ataa.agent.genetic.gene.NeuralNetworkGene;
+
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.Genotype;
@@ -59,7 +61,7 @@ public class GeneticModelCreator {
 		Genotype genotype = null;
 		try {
 			IChromosome sampleChromosome = new Chromosome(gaConf,
-					new SuperGene(gaConf), geneNumber);
+					new NeuralNetworkGene(gaConf), geneNumber);
 
 			gaConf.setAlwaysCaculateFitness(true); // is this needed ?
 			gaConf.setSampleChromosome(sampleChromosome);

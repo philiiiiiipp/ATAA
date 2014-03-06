@@ -25,11 +25,11 @@ public class NeuroEvolutionaryAgent extends NeuralNetworkAgent {
         // Build the neural network as specified in (Fig 1. Koppejan & Whiteson,
         // 2011)
 
-        addLayer(9, mSumInputFunction, mSumTransferFunction);
+        setInputLayer(9, mSumInputFunction, mSumTransferFunction);
         addLayerWithBias(3, mSumInputFunction, mSigmoidTransferFunction);
         addLayerWithBias(4, mSumInputFunction, mSumTransferFunction);
         addLayerWithBias(4, mSumInputFunction, mSigmoidTransferFunction);
-        addLayerWithBias(4, mSumInputFunction, mSumTransferFunction);
+        setOutputLayerWithBias(4, mSumInputFunction, mSumTransferFunction);
 
         // Connect input to first hidden layer
         connectNeurons(0, 0, 1, 0);

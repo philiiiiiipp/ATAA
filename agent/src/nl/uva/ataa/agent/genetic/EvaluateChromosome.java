@@ -5,17 +5,17 @@ import org.jgap.IChromosome;
 
 public class EvaluateChromosome extends FitnessFunction {
 
-	/**
-	 * Generated default serial UID
-	 */
-	private static final long serialVersionUID = 3905984536032544547L;
+    /**
+     * Generated default serial UID
+     */
+    private static final long serialVersionUID = 3905984536032544547L;
 
-	public EvaluateChromosome() {
+    public EvaluateChromosome() {
 
-	}
+    }
 
-	@Override
-	protected double evaluate(final IChromosome a_subject) {
-		return a_subject.getFitnessValue();
-	}
+    @Override
+    protected double evaluate(final IChromosome chromosome) {
+        return chromosome.getFitnessValueDirectly();
+    }
 }

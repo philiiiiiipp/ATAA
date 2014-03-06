@@ -46,7 +46,6 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     protected void addLayerWithBias(final int numNeurons, final InputFunction inputFunction,
             final TransferFunction transferFunction) {
         final Neuron bias = new BiasNeuron();
-        mNeuralNetwork.getLayerAt(mNeuralNetwork.getLayersCount() - 1).addNeuron(bias);
 
         final Layer layer = getLayer(numNeurons, inputFunction, transferFunction);
         for (final Neuron neuron : layer.getNeurons()) {
@@ -71,6 +70,28 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     protected void addLayer(final int numNeurons, final InputFunction inputFunction,
             final TransferFunction transferFunction) {
         mNeuralNetwork.addLayer(getLayer(numNeurons, inputFunction, transferFunction));
+    }
+
+    protected void setInputLayer(final int numNeurons, final InputFunction inputFunction,
+            final TransferFunction transferFunction) {
+        final Neuron[] neurons = new Neuron[numNeurons];
+        for (int i = 0; i < numNeurons; ++i) {
+            neurons[i] = new Neuron(inputFunction, transferFunction);
+        }
+        mNeuralNetwork.setInputNeurons(neurons);
+    }
+
+    protected void setOutputLayerWithBias(final int numNeurons, final InputFunction inputFunction,
+            final TransferFunction transferFunction) {
+        final Neuron bias = new BiasNeuron();
+        mNeuralNetwork.getLayerAt(mNeuralNetwork.getLayersCount() - 1).addNeuron(bias);
+
+        final Neuron[] neurons = new Neuron[numNeurons];
+        for (int i = 0; i < numNeurons; ++i) {
+            neurons[i] = new Neuron(inputFunction, transferFunction);
+            neurons[i].addInputConnection(bias);
+        }
+        mNeuralNetwork.setOutputNeurons(neurons);
     }
 
     /**
@@ -106,10 +127,19 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
      */
     protected void connectNeurons(final int inputLayer, final int inputNeuron, final int outputLayer,
             final int outputNeuron) {
-        final Neuron input = mNeuralNetwork.getLayerAt(inputLayer).getNeuronAt(inputNeuron);
-        final Neuron output = mNeuralNetwork.getLayerAt(outputLayer).getNeuronAt(outputNeuron);
-        output.addInputConnection(input);
+        getNeuron(outputLayer, outputNeuron).addInputConnection(getNeuron(inputLayer, inputNeuron));
+    }
 
+    private Neuron getNeuron(final int layer, final int neuron) {
+        if (layer == 0) {
+            return mNeuralNetwork.getInputNeurons()[neuron];
+        }
+
+        if (layer == mNeuralNetwork.getLayersCount() + 1) {
+            return mNeuralNetwork.getOutputNeurons()[neuron];
+        }
+
+        return mNeuralNetwork.getLayerAt(layer - 1).getNeuronAt(neuron);
     }
 
     /**

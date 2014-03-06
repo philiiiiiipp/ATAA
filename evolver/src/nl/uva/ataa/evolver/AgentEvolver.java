@@ -59,8 +59,15 @@ public class AgentEvolver {
 
     public void evolveAgents() {
 
+        final double[] fitness = new double[mAgents.size()];
         for (int i = 0; i < mAgents.size(); ++i) {
-            mGenotype.getPopulation().getChromosome(i).setFitnessValue(mAgents.get(i).getFitness());
+            fitness[i] = mAgents.get(i).getFitness();
+        }
+
+        final double[] adjustedFitness = EvolverHelper.adjustFitness(fitness);
+
+        for (int i = 0; i < mAgents.size(); ++i) {
+            mGenotype.getPopulation().getChromosome(i).setFitnessValueDirectly(adjustedFitness[i]);
         }
 
         mGenotype.evolve();

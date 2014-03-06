@@ -1,5 +1,7 @@
 package nl.uva.glue;
 
+import java.util.List;
+
 import nl.uva.ataa.agent.NeuralNetworkAgent;
 import nl.uva.ataa.environment.EvolutionaryEnvironment;
 import nl.uva.ataa.evolver.AgentEvolver;
@@ -21,8 +23,8 @@ public class Main {
         for (int generation = 0; generation < NUM_GENERATIONS; generation++) {
 
             // EVOLVE
-            environmentEvolver.evolveEnvironments();
-            agentEvolver.evolveAgents();
+            List<EvolutionaryEnvironment> environments = environmentEvolver.evolveEnvironments();
+            agentEvolver.evolveAgents(environments);
 
             // cleanup
             for (final EvolutionaryEnvironment environment : environmentEvolver.getEnvironments()) {

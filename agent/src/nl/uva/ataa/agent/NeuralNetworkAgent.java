@@ -30,8 +30,6 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     /** The rewards that the agent has gathered during tests */
     private double mAccumulatedReward = 0.0;
 
-    private Double mCachedFitness = null;
-
     public NeuralNetworkAgent() {
         buildNeuralNetwork();
     }
@@ -248,26 +246,21 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
      * @return The agent's fitness
      */
     public double getFitness() {
-        if (mCachedFitness == null) {
-            for (final EvolutionaryEnvironment environment : mEnvironments) {
-                agent_init(environment.env_init());
+        for (final EvolutionaryEnvironment environment : mEnvironments) {
+            agent_init(environment.env_init());
 
-                EpisodeRunner.run(environment, this);
+            EpisodeRunner.run(environment, this);
 
-                mAccumulatedReward -= environment.getMinimimReward();
-            }
-
-            mCachedFitness = mAccumulatedReward / mNrEpisodes;
+            mAccumulatedReward -= environment.getMinimimReward();
         }
 
-        return mCachedFitness;
+        return mAccumulatedReward / mNrEpisodes;
     }
 
     @Override
     public void agent_cleanup() {
         mAccumulatedReward = 0.0;
         mNrEpisodes = 0;
-        mCachedFitness = null;
     }
 
     @Override

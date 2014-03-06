@@ -15,15 +15,15 @@ public class PolicyChromosomeEvaluator extends FitnessFunction {
      */
     private static final long serialVersionUID = 3905984536032544547L;
 
-    private static final NeuroEvolutionaryAgent mTestAgent = new NeuroEvolutionaryAgent();
+    private static final NeuroEvolutionaryAgent sTestAgent = new NeuroEvolutionaryAgent();
 
     public void setEnvironments(final List<EvolutionaryEnvironment> environments) {
-        mTestAgent.setEnvironments(environments);
+        sTestAgent.setEnvironments(environments);
     }
 
     @Override
     protected double evaluate(final IChromosome chromosome) {
-        mTestAgent.setWeights(chromosome);
-        return mTestAgent.getFitness();
+        sTestAgent.setWeights(chromosome);
+        return sTestAgent.getFitness();
     }
 }

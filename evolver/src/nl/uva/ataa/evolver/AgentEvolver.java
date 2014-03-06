@@ -28,29 +28,29 @@ public class AgentEvolver {
         try {
 
             Configuration.reset();
-            Configuration gaConf = new DefaultConfiguration();
+            final Configuration gaConf = new DefaultConfiguration();
             gaConf.setPreservFittestIndividual(true);
             gaConf.setKeepPopulationSizeConstant(true);
             gaConf.setFitnessFunction(new EvaluateChromosome());
 
             for (int i = 0; i < poolSize; i++) {
-                NeuroEvolutionaryAgent nAgent = new NeuroEvolutionaryAgent();
+                final NeuroEvolutionaryAgent nAgent = new NeuroEvolutionaryAgent();
                 mAgents.add(nAgent);
             }
 
-            IChromosome sampleChromosome = new Chromosome(gaConf, new SuperGene(gaConf),
-                    mAgents.get(0).getWeights().length);
+            final IChromosome sampleChromosome = new Chromosome(gaConf, new SuperGene(gaConf), mAgents.get(0)
+                    .getWeights().length);
 
             gaConf.setSampleChromosome(sampleChromosome);
             gaConf.setPopulationSize(poolSize);
 
             genotype = Genotype.randomInitialGenotype(gaConf);
-            Population population = genotype.getPopulation();
+            final Population population = genotype.getPopulation();
             for (int i = 0; i < genotype.getPopulation().size(); ++i) {
                 mAgents.get(i).setWeights(population.getChromosome(i));
             }
 
-        } catch (InvalidConfigurationException e) {
+        } catch (final InvalidConfigurationException e) {
             e.printStackTrace();
         }
 
@@ -60,7 +60,7 @@ public class AgentEvolver {
     public void evolveAgents() {
 
         for (int i = 0; i < mAgents.size(); ++i) {
-            // mGenotype.getPopulation().getChromosome(i).setFitnessValue(mAgents.get(i).getFitness());
+            mGenotype.getPopulation().getChromosome(i).setFitnessValue(mAgents.get(i).getFitness());
         }
 
         mGenotype.evolve();

@@ -1,6 +1,5 @@
 package nl.uva.ataa.environment;
 
-import java.util.Collection;
 import java.util.Random;
 
 import org.rlcommunity.environment.helicopter.Helicopter;
@@ -46,7 +45,7 @@ public class EvolutionaryEnvironment extends Helicopter {
      * 
      * @return The environments's fitness
      */
-    public double getFitness(final Collection<EvolutionaryEnvironment> environmentsInGeneration) {
+    public double getFitness() {
         return -mAccumulatedReward;
     }
 }

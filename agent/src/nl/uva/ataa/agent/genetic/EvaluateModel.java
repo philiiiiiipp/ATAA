@@ -10,9 +10,8 @@ public class EvaluateModel extends FitnessFunction {
 	 */
 	private static final long serialVersionUID = 3905984536032544547L;
 
-
 	public EvaluateModel() {
-	
+
 	}
 
 	@Override
@@ -21,9 +20,9 @@ public class EvaluateModel extends FitnessFunction {
 		SuperGene[] genes = new SuperGene[a_subject.getGenes().length];
 		for (int i = 0; i < a_subject.getGenes().length; ++i) {
 			genes[i] = (SuperGene) a_subject.getGene(i);
+
 		}
 
-		
-		return -1;
+		return 1;
 	}
 }

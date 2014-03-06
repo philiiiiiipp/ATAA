@@ -15,7 +15,7 @@ public class SuperGene extends BaseGene implements Gene, java.io.Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 3348371688942532307L;
-	private Double mGeneValue = new Double(0.5);
+	private Double mGeneValue = new Double(0.0);
 
 	/**
 	 * Constructs a new QuarterGene with no maximum number of quarters that can
@@ -91,7 +91,11 @@ public class SuperGene extends BaseGene implements Gene, java.io.Serializable {
 	 */
 	@Override
 	public void setToRandomValue(final RandomGenerator a_numberGenerator) {
-		mGeneValue = randomNumber(101);
+		mGeneValue = Utilities.RNG.nextDouble();
+
+		if (!Utilities.RNG.nextBoolean()) {
+			mGeneValue *= -1;
+		}
 	}
 
 	/**
@@ -205,7 +209,7 @@ public class SuperGene extends BaseGene implements Gene, java.io.Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		return (int) (mGeneValue * 100);
+		return mGeneValue.hashCode();
 	}
 
 	@Override
@@ -213,30 +217,17 @@ public class SuperGene extends BaseGene implements Gene, java.io.Serializable {
 		return mGeneValue;
 	}
 
-	private double randomNumber(final int max) {
-		return ((double) Utilities.RNG.nextInt(max)) / 100;
-	}
-
 	@Override
 	public void applyMutation(final int a_index, final double a_percentage) {
-		int maxMutation = (int) (101 * Math.abs(a_percentage));
+		// randomly change gene up to a % threshold
 
-		if (maxMutation == 0)
-			return;
+		double mutation = 1 * a_percentage;
 
-		double mutation = randomNumber(maxMutation);
-
-		if (a_percentage > 0) {
+		if (Utilities.RNG.nextBoolean()) {
 			mGeneValue += mutation;
-			if (mGeneValue > 1)
-				mGeneValue = new Double(1);
-
 		} else {
 			mGeneValue -= mutation;
-			if (mGeneValue < 0)
-				mGeneValue = new Double(0);
 		}
-
 		setAllele(mGeneValue);
 	}
 }

@@ -18,6 +18,9 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     /** The neural network used to map observations to actions */
     protected final NeuralNetwork<?> mNeuralNetwork = new NeuralNetwork<>();
 
+    /** The nr of episodes run during tests */
+    private int mNrEpisodes = 0;
+
     /** The rewards that the agent has gathered during tests */
     private double mAccumulatedReward = 0.0;
 
@@ -34,8 +37,6 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
      * Adds a layer to the neural network and adds a bias neuron to the previous layer which
      * connects to every neuron in the new layer.
      * 
-     * @param neuralNetwork
-     *            The neural network to add a layer to
      * @param numNeurons
      *            The amount of neurons in the new layer
      * @param inputFunction
@@ -58,8 +59,6 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     /**
      * Adds a layer to the neural network.
      * 
-     * @param neuralNetwork
-     *            The neural network to add a layer to
      * @param numNeurons
      *            The amount of neurons in the new layer
      * @param inputFunction
@@ -72,6 +71,16 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
         mNeuralNetwork.addLayer(getLayer(numNeurons, inputFunction, transferFunction));
     }
 
+    /**
+     * Sets the input layer for this neural network.
+     * 
+     * @param numNeurons
+     *            The amount of neurons in the new layer
+     * @param inputFunction
+     *            The input function to use for the neurons in the new layer
+     * @param transferFunction
+     *            The transfer function to use for the neurons in the new layer
+     */
     protected void setInputLayer(final int numNeurons, final InputFunction inputFunction,
             final TransferFunction transferFunction) {
         final Neuron[] neurons = new Neuron[numNeurons];
@@ -81,6 +90,16 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
         mNeuralNetwork.setInputNeurons(neurons);
     }
 
+    /**
+     * Sets the output layer for this neural network and adds bias to it.
+     * 
+     * @param numNeurons
+     *            The amount of neurons in the new layer
+     * @param inputFunction
+     *            The input function to use for the neurons in the new layer
+     * @param transferFunction
+     *            The transfer function to use for the neurons in the new layer
+     */
     protected void setOutputLayerWithBias(final int numNeurons, final InputFunction inputFunction,
             final TransferFunction transferFunction) {
         final Neuron bias = new BiasNeuron();
@@ -130,6 +149,16 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
         getNeuron(outputLayer, outputNeuron).addInputConnection(getNeuron(inputLayer, inputNeuron));
     }
 
+    /**
+     * Retrieves the neuron at the specified coordinates.
+     * 
+     * @param layer
+     *            The layer of the neuron
+     * @param neuron
+     *            The index of the neuron within the layer
+     * 
+     * @return The neuron
+     */
     private Neuron getNeuron(final int layer, final int neuron) {
         if (layer == 0) {
             return mNeuralNetwork.getInputNeurons()[neuron];
@@ -211,12 +240,13 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
      * @return The agent's fitness
      */
     public double getFitness() {
-        return mAccumulatedReward;
+        return mAccumulatedReward / mNrEpisodes;
     }
 
     @Override
     public void agent_cleanup() {
         mAccumulatedReward = 0.0;
+        mNrEpisodes = 0;
     }
 
     @Override

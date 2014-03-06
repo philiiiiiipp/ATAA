@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/RLGlueCodec.jar"/>
-	<classpathentry kind="lib" path="lib/jgap.jar" sourcepath="C:/Users/Lusl/git/ATAA/jgap_3/src"/>
+	<classpathentry kind="lib" path="lib/jgap.jar" sourcepath="D:/Dev/ATAA/jgap_3/src"/>
 	<classpathentry kind="lib" path="lib/neuroph-core-2.8.jar" sourcepath="D:/Dev/ATAA/neuroph/srccore"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

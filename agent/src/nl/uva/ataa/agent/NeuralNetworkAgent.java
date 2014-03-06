@@ -18,6 +18,9 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     /** The neural network used to map observations to actions */
     protected final NeuralNetwork<?> mNeuralNetwork = new NeuralNetwork<>();
 
+    /** The nr of episodes run during tests */
+    private int mNrEpisodes = 0;
+
     /** The rewards that the agent has gathered during tests */
     private double mAccumulatedReward = 0.0;
 
@@ -237,12 +240,13 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
      * @return The agent's fitness
      */
     public double getFitness() {
-        return mAccumulatedReward;
+        return mAccumulatedReward / mNrEpisodes;
     }
 
     @Override
     public void agent_cleanup() {
         mAccumulatedReward = 0.0;
+        mNrEpisodes = 0;
     }
 
     @Override

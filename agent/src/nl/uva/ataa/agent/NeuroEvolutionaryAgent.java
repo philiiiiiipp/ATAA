@@ -78,4 +78,5 @@ public class NeuroEvolutionaryAgent extends NeuralNetworkAgent {
     public static void main(final String[] args) {
         new AgentLoader(new NeuroEvolutionaryAgent()).run();
     }
+
 }

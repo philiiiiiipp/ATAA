@@ -47,6 +47,6 @@ public class EvolutionaryEnvironment extends Helicopter {
      * @return The environments's fitness
      */
     public double getFitness(final Collection<EvolutionaryEnvironment> environmentsInGeneration) {
-        return mAccumulatedReward;
+        return -mAccumulatedReward;
     }
 }

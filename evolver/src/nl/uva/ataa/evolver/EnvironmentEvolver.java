@@ -1,11 +1,13 @@
 package nl.uva.ataa.evolver;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import nl.uva.ataa.agent.genetic.EvaluateChromosome;
-import nl.uva.ataa.agent.genetic.SuperGene;
+import nl.uva.ataa.agent.genetic.gene.WindGene;
 import nl.uva.ataa.environment.EvolutionaryEnvironment;
+import nl.uva.ataa.environment.Wind;
 
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
@@ -32,12 +34,7 @@ public class EnvironmentEvolver {
             gaConf.setKeepPopulationSizeConstant(true);
             gaConf.setFitnessFunction(new EvaluateChromosome());
 
-            for (int i = 0; i < poolSize; i++) {
-                mEnvironments.add(new EvolutionaryEnvironment());
-            }
-
-            final IChromosome sampleChromosome = new Chromosome(gaConf, new SuperGene(gaConf), mEnvironments.get(0)
-                    .getWeights().length);
+            final IChromosome sampleChromosome = new Chromosome(gaConf, new WindGene(gaConf), 8);
 
             gaConf.setSampleChromosome(sampleChromosome);
             gaConf.setPopulationSize(poolSize);
@@ -45,7 +42,13 @@ public class EnvironmentEvolver {
             genotype = Genotype.randomInitialGenotype(gaConf);
             final Population population = genotype.getPopulation();
             for (int i = 0; i < genotype.getPopulation().size(); ++i) {
-                mEnvironments.get(i).setWeights(population.getChromosome(i));
+                IChromosome chromosome = population.getChromosome(i);
+                WindGene[] genes = (WindGene[]) chromosome.getGenes();
+
+                WindGene[] windNS = Arrays.copyOfRange(genes, 0, 4);
+                WindGene[] windEW = Arrays.copyOfRange(genes, 4, 8);
+
+                mEnvironments.add(new EvolutionaryEnvironment(new Wind(windNS), new Wind(windEW)));
             }
 
         } catch (final InvalidConfigurationException e) {
@@ -64,7 +67,7 @@ public class EnvironmentEvolver {
         mGenotype.evolve();
 
         for (int i = 0; i < mEnvironments.size(); ++i) {
-            mEnvironments.get(i).setWeights(mGenotype.getPopulation().getChromosome(i));
+            // mEnvironments.get(i).setWeights(mGenotype.getPopulation().getChromosome(i));
         }
     }
 

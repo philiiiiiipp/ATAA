@@ -4,5 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/RLGlueCodec.jar"/>
 	<classpathentry kind="lib" path="lib/RLVizLib.jar"/>
+	<classpathentry kind="lib" path="lib/jgap.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/HelicopterAgent"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

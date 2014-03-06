@@ -1,5 +1,8 @@
 package nl.uva.ataa.agent;
 
+import nl.uva.ataa.agent.genetic.SuperGene;
+
+import org.jgap.IChromosome;
 import org.neuroph.core.Layer;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.Neuron;
@@ -117,6 +120,23 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
      */
     public void setWeights(final double[] weights) {
         mNeuralNetwork.setWeights(weights);
+    }
+
+    /**
+     * Sets all the weights in the neural network.
+     * 
+     * @param weights
+     *            The weights ordered by connection
+     */
+    public void setWeights(final IChromosome chromosome) {
+        final double[] weights = new double[chromosome.getGenes().length];
+
+        for (int i = 0; i < chromosome.getGenes().length; ++i) {
+            final SuperGene superGene = (SuperGene) chromosome.getGene(i);
+            weights[i] = superGene.doubleValue();
+        }
+
+        setWeights(weights);
     }
 
     /**

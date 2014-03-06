@@ -3,6 +3,7 @@ package nl.uva.ataa.environment;
 import java.util.Random;
 
 import org.rlcommunity.environment.helicopter.Helicopter;
+import org.rlcommunity.environment.helicopter.HelicopterState;
 import org.rlcommunity.rlglue.codec.types.Action;
 import org.rlcommunity.rlglue.codec.types.Reward_observation_terminal;
 
@@ -47,5 +48,24 @@ public class EvolutionaryEnvironment extends Helicopter {
      */
     public double getFitness() {
         return -mAccumulatedReward;
+    }
+
+    /**
+     * Calculates the worst reward that's possible to get in an episode.
+     * 
+     * @return The minimum reward
+     */
+    public double getMinimimReward() {
+        return -3.0f
+                * HelicopterState.MAX_POS
+                * HelicopterState.MAX_POS
+                + -3.0f
+                * HelicopterState.MAX_RATE
+                * HelicopterState.MAX_RATE
+                + -3.0f
+                * HelicopterState.MAX_VEL
+                * HelicopterState.MAX_VEL
+                - (1.0f - HelicopterState.MIN_QW_BEFORE_HITTING_TERMINAL_STATE
+                        * HelicopterState.MIN_QW_BEFORE_HITTING_TERMINAL_STATE);
     }
 }

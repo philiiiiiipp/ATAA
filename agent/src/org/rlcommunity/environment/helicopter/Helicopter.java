@@ -24,7 +24,7 @@ package org.rlcommunity.environment.helicopter;
 import java.net.URL;
 import java.util.Vector;
 
-import nl.uva.ataa.glue.EpisodeRunner;
+import nl.uva.ataa.EpisodeRunner;
 
 import org.rlcommunity.environment.helicopter.messages.HelicopterRangeResponse;
 import org.rlcommunity.environment.helicopter.messages.HelicopterStateResponse;
@@ -34,6 +34,7 @@ import org.rlcommunity.rlglue.codec.taskspec.ranges.DoubleRange;
 import org.rlcommunity.rlglue.codec.types.Action;
 import org.rlcommunity.rlglue.codec.types.Observation;
 import org.rlcommunity.rlglue.codec.types.Reward_observation_terminal;
+
 
 //import rlglue.types.Random_seed_key;
 //import rlglue.types.Reward_observation;

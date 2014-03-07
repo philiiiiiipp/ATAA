@@ -2,7 +2,7 @@ package nl.uva.ataa.evolver;
 
 import java.util.List;
 
-import nl.uva.ataa.agent.genetic.evaluator.PolicyChromosomeEvaluator;
+import nl.uva.ataa.agent.genetic.evaluator.AgentChromosomeEvaluator;
 import nl.uva.ataa.agent.genetic.gene.NeuralNetworkGene;
 import nl.uva.ataa.environment.Predictor;
 
@@ -19,7 +19,7 @@ public class AgentEvolver {
     private final Genotype mGenotype;
 
     /** The currently used fitness function */
-    private final PolicyChromosomeEvaluator mFitnessFunction;
+    private final AgentChromosomeEvaluator mFitnessFunction;
 
     /**
      * Creates an agent evolver
@@ -29,7 +29,7 @@ public class AgentEvolver {
      */
     public AgentEvolver(final int poolSize) {
         Genotype genotype = null;
-        PolicyChromosomeEvaluator evaluator = null;
+        AgentChromosomeEvaluator evaluator = null;
         try {
 
             Configuration.reset();
@@ -37,11 +37,11 @@ public class AgentEvolver {
             gaConf.setPreservFittestIndividual(true);
             gaConf.setKeepPopulationSizeConstant(true);
 
-            evaluator = new PolicyChromosomeEvaluator();
+            evaluator = new AgentChromosomeEvaluator();
             gaConf.setFitnessFunction(evaluator);
 
             final IChromosome sampleChromosome = new Chromosome(gaConf, new NeuralNetworkGene(gaConf),
-                    PolicyChromosomeEvaluator.getAgent().getWeights().length);
+                    AgentChromosomeEvaluator.getAgent().getWeights().length);
 
             gaConf.setSampleChromosome(sampleChromosome);
             gaConf.setPopulationSize(poolSize);
@@ -69,7 +69,5 @@ public class AgentEvolver {
         mGenotype.evolve();
 
         System.out.println(mFitnessFunction.getAverageSteps());
-
-        // System.out.println("====================");
     }
 }

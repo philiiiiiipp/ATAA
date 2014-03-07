@@ -2,11 +2,11 @@ package nl.uva.ataa.agent;
 
 import java.util.List;
 
+import nl.uva.ataa.EpisodeRunner;
 import nl.uva.ataa.agent.genetic.gene.NeuralNetworkGene;
-import nl.uva.ataa.agent.utilities.Utilities;
 import nl.uva.ataa.environment.Predictor;
 import nl.uva.ataa.environment.WindEnvironment;
-import nl.uva.ataa.glue.EpisodeRunner;
+import nl.uva.ataa.utilities.Utilities;
 
 import org.jgap.IChromosome;
 import org.neuroph.core.Layer;

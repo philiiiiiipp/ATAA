@@ -1,4 +1,4 @@
-package nl.uva.ataa.agent.genetic.gene;
+package nl.uva.ataa.evolver.gene;
 
 import nl.uva.ataa.utilities.Utilities;
 
@@ -9,16 +9,16 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
 import org.jgap.UnsupportedRepresentationException;
 
-public class NeuralNetworkGene extends BaseGene implements Gene, java.io.Serializable {
+public class PredictorGene extends BaseGene implements Gene, java.io.Serializable {
 
     private static final long serialVersionUID = 3348371688942532307L;
-    private Double mGeneValue = new Double(0.0);
+    private Double mGeneValue = new Double(0.5);
 
     /**
      * Constructs a new QuarterGene with no maximum number of quarters that can be represented (other than
      * Integer.MAX_VALUE, of course).
      */
-    public NeuralNetworkGene(final Configuration a_conf) throws InvalidConfigurationException {
+    public PredictorGene(final Configuration a_conf) throws InvalidConfigurationException {
         super(a_conf);
     }
 
@@ -36,12 +36,12 @@ public class NeuralNetworkGene extends BaseGene implements Gene, java.io.Seriali
      * @return A new Gene instance of the same type and with the same setup as this concrete Gene.
      */
     @Override
-    public NeuralNetworkGene newGeneInternal() {
+    public PredictorGene newGeneInternal() {
         try {
             // We construct the new QuarterGene with the same maximum number
             // of quarters that this Gene was constructed with.
             // -------------------------------------------------------------
-            return new NeuralNetworkGene(getConfiguration());
+            return new PredictorGene(getConfiguration());
         } catch (final InvalidConfigurationException ex) {
             throw new IllegalStateException(ex.getMessage());
         }
@@ -80,10 +80,6 @@ public class NeuralNetworkGene extends BaseGene implements Gene, java.io.Seriali
     @Override
     public void setToRandomValue(final RandomGenerator a_numberGenerator) {
         mGeneValue = Utilities.RNG.nextDouble();
-
-        if (!Utilities.RNG.nextBoolean()) {
-            mGeneValue *= -1;
-        }
     }
 
     /**
@@ -151,11 +147,12 @@ public class NeuralNetworkGene extends BaseGene implements Gene, java.io.Seriali
     @Override
     public int compareTo(final Object a_otherQuarterGene) {
         // If the other allele is null, we're bigger.
+        // ------------------------------------------
         if (a_otherQuarterGene == null) {
             return 1;
         }
 
-        return mGeneValue.compareTo(((NeuralNetworkGene) a_otherQuarterGene).mGeneValue);
+        return mGeneValue.compareTo(((PredictorGene) a_otherQuarterGene).mGeneValue);
     }
 
     /**
@@ -165,7 +162,7 @@ public class NeuralNetworkGene extends BaseGene implements Gene, java.io.Seriali
      */
     @Override
     public boolean equals(final Object otherQuarterGene) {
-        return otherQuarterGene instanceof NeuralNetworkGene && compareTo(otherQuarterGene) == 0;
+        return otherQuarterGene instanceof PredictorGene && compareTo(otherQuarterGene) == 0;
     }
 
     public double doubleValue() {
@@ -193,8 +190,10 @@ public class NeuralNetworkGene extends BaseGene implements Gene, java.io.Seriali
 
         if (Utilities.RNG.nextBoolean()) {
             mGeneValue += mutation;
+            if (mGeneValue > 1) mGeneValue = 1.0;
         } else {
             mGeneValue -= mutation;
+            if (mGeneValue < 0) mGeneValue = 0.0;
         }
         setAllele(mGeneValue);
     }

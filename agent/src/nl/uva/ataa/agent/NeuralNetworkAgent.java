@@ -3,9 +3,9 @@ package nl.uva.ataa.agent;
 import java.util.List;
 
 import nl.uva.ataa.EpisodeRunner;
-import nl.uva.ataa.agent.genetic.gene.NeuralNetworkGene;
 import nl.uva.ataa.environment.Predictor;
 import nl.uva.ataa.environment.WindEnvironment;
+import nl.uva.ataa.evolver.gene.NeuralNetworkGene;
 import nl.uva.ataa.utilities.Utilities;
 
 import org.jgap.IChromosome;

@@ -2,9 +2,9 @@ package nl.uva.ataa.evolver;
 
 import java.util.List;
 
-import nl.uva.ataa.agent.genetic.evaluator.AgentChromosomeEvaluator;
-import nl.uva.ataa.agent.genetic.gene.NeuralNetworkGene;
 import nl.uva.ataa.environment.Predictor;
+import nl.uva.ataa.evolver.evaluator.NeuroEvolutionaryAgentEvaluator;
+import nl.uva.ataa.evolver.gene.NeuralNetworkGene;
 
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
@@ -19,7 +19,7 @@ public class AgentEvolver {
     private final Genotype mGenotype;
 
     /** The currently used fitness function */
-    private final AgentChromosomeEvaluator mFitnessFunction;
+    private final NeuroEvolutionaryAgentEvaluator mFitnessFunction;
 
     /**
      * Creates an agent evolver
@@ -29,7 +29,7 @@ public class AgentEvolver {
      */
     public AgentEvolver(final int poolSize) {
         Genotype genotype = null;
-        AgentChromosomeEvaluator evaluator = null;
+        NeuroEvolutionaryAgentEvaluator evaluator = null;
         try {
 
             Configuration.reset();
@@ -37,11 +37,11 @@ public class AgentEvolver {
             gaConf.setPreservFittestIndividual(true);
             gaConf.setKeepPopulationSizeConstant(true);
 
-            evaluator = new AgentChromosomeEvaluator();
+            evaluator = new NeuroEvolutionaryAgentEvaluator();
             gaConf.setFitnessFunction(evaluator);
 
             final IChromosome sampleChromosome = new Chromosome(gaConf, new NeuralNetworkGene(gaConf),
-                    AgentChromosomeEvaluator.getAgent().getWeights().length);
+                    NeuroEvolutionaryAgentEvaluator.getAgent().getWeights().length);
 
             gaConf.setSampleChromosome(sampleChromosome);
             gaConf.setPopulationSize(poolSize);

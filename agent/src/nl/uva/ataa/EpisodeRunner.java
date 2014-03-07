@@ -24,7 +24,7 @@ public class EpisodeRunner {
 
     public static void main(final String[] args) {
 
-        final PredictorEvolver predictorEvolver = new PredictorEvolver(1);
+        final PredictorEvolver predictorEvolver = new PredictorEvolver(10);
         final AgentEvolver agentEvolver = new AgentEvolver(50);
 
         for (int generation = 0; generation < NUM_GENERATIONS; generation++) {

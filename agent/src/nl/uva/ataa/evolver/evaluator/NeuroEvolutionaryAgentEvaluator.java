@@ -1,4 +1,4 @@
-package nl.uva.ataa.agent.genetic.evaluator;
+package nl.uva.ataa.evolver.evaluator;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import nl.uva.ataa.environment.Predictor;
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 
-public class AgentChromosomeEvaluator extends FitnessFunction {
+public class NeuroEvolutionaryAgentEvaluator extends FitnessFunction {
 
     private static final long serialVersionUID = 3905984536032544547L;
 

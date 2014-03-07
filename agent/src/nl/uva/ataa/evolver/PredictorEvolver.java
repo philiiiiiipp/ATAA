@@ -3,6 +3,7 @@ package nl.uva.ataa.evolver;
 import java.util.ArrayList;
 import java.util.List;
 
+import nl.uva.ataa.environment.BetaPredictor;
 import nl.uva.ataa.environment.Predictor;
 
 public class PredictorEvolver {
@@ -13,7 +14,7 @@ public class PredictorEvolver {
     public PredictorEvolver(final int poolSize) {
         mPoolSize = poolSize;
         for (int i = 0; i < mPoolSize; i++) {
-            mPredictors.add(new Predictor());
+            mPredictors.add(new BetaPredictor());
         }
     }
 

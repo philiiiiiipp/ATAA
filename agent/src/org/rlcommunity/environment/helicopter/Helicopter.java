@@ -26,15 +26,12 @@ import java.util.Vector;
 
 import nl.uva.ataa.EpisodeRunner;
 
-import org.rlcommunity.environment.helicopter.messages.HelicopterRangeResponse;
-import org.rlcommunity.environment.helicopter.messages.HelicopterStateResponse;
 import org.rlcommunity.rlglue.codec.taskspec.TaskSpec;
 import org.rlcommunity.rlglue.codec.taskspec.TaskSpecVRLGLUE3;
 import org.rlcommunity.rlglue.codec.taskspec.ranges.DoubleRange;
 import org.rlcommunity.rlglue.codec.types.Action;
 import org.rlcommunity.rlglue.codec.types.Observation;
 import org.rlcommunity.rlglue.codec.types.Reward_observation_terminal;
-
 
 //import rlglue.types.Random_seed_key;
 //import rlglue.types.Reward_observation;
@@ -330,19 +327,6 @@ public abstract class Helicopter extends EnvironmentBase implements HasAVisualiz
 
         if (theMessageObject.canHandleAutomatically(this)) return theMessageObject.handleAutomatically(this);
 
-        // must be a custom Helicopter Message
-        if (theMessageObject.getTheMessageType() == rlVizLib.messaging.environment.EnvMessageType.kEnvCustom.id()) {
-            final String theCustomType = theMessageObject.getPayLoad();
-            if (theCustomType.equals("GETHELISTATE")) {
-                final HelicopterStateResponse theResponseObject = new HelicopterStateResponse(heli.velocity,
-                        heli.position, heli.angular_rate, heli.q);
-                return theResponseObject.makeStringResponse();
-            }
-            if (theCustomType.equals("GETHELIRANGE")) {
-                final HelicopterRangeResponse theResponseObject = new HelicopterRangeResponse(heli.mins, heli.maxs);
-                return theResponseObject.makeStringResponse();
-            }
-        }
         System.err.println("We need some code written in Env Message for  " + " Helicopter. unknown request received: "
                 + theMessage);
         Thread.dumpStack();

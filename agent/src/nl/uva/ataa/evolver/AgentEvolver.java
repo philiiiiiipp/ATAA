@@ -1,73 +1,100 @@
 package nl.uva.ataa.evolver;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import nl.uva.ataa.environment.Predictor;
-import nl.uva.ataa.evolver.evaluator.NeuroEvolutionaryAgentEvaluator;
-import nl.uva.ataa.evolver.gene.NeuralNetworkGene;
+import nl.uva.ataa.agent.ShimonsAgent;
+import nl.uva.ataa.evolver.genetic.DoubleChromosome;
+import nl.uva.ataa.evolver.genetic.DoubleChromosomePopulation;
+import nl.uva.ataa.evolver.genetic.DoubleMutationPolicy;
 
-import org.jgap.Chromosome;
-import org.jgap.Configuration;
-import org.jgap.Genotype;
-import org.jgap.IChromosome;
-import org.jgap.InvalidConfigurationException;
-import org.jgap.impl.DefaultConfiguration;
+import org.apache.commons.math3.genetics.GeneticAlgorithm;
+import org.apache.commons.math3.genetics.TournamentSelection;
+import org.apache.commons.math3.genetics.UniformCrossover;
 
 public class AgentEvolver {
 
-    /** The currently used genotype */
-    private final Genotype mGenotype;
+    /** The chance that two chromosomes will mate */
+    private static final double CROSSOVER_RATE = 0.8;
+    /** The ratio between parents' genes during mating */
+    private static final double CROSSOVER_RATIO = 0.8;
 
-    /** The currently used fitness function */
-    private final NeuroEvolutionaryAgentEvaluator mFitnessFunction;
+    /** The chance that a chromosome will mutate one of its genes */
+    private static final double MUTATION_RATE = 0.5;
+    /** The range that a gene can maximaly mutate */
+    private static final double MUTATION_RANGE = 1.5;
+
+    /** The amount of chromosomes that compete for reproduction */
+    private static final int TOURNAMENT_SIZE = 5;
+
+    /** The agents that will be evolved */
+    private final List<ShimonsAgent> mAgents = new ArrayList<>();
+
+    /** The algorithm performing the evolutions */
+    final GeneticAlgorithm mGeneticAlgorithm = new GeneticAlgorithm(new UniformCrossover<DoubleChromosome>(
+            CROSSOVER_RATIO), CROSSOVER_RATE, new DoubleMutationPolicy(MUTATION_RANGE), MUTATION_RATE,
+            new TournamentSelection(TOURNAMENT_SIZE));
 
     /**
-     * Creates an agent evolver
+     * Creates an evolver with random agents.
      * 
      * @param poolSize
      *            The amount of agents to evolve
      */
     public AgentEvolver(final int poolSize) {
-        Genotype genotype = null;
-        NeuroEvolutionaryAgentEvaluator evaluator = null;
-        try {
-
-            Configuration.reset();
-            final Configuration gaConf = new DefaultConfiguration();
-            gaConf.setPreservFittestIndividual(true);
-            gaConf.setKeepPopulationSizeConstant(true);
-
-            evaluator = new NeuroEvolutionaryAgentEvaluator();
-            gaConf.setFitnessFunction(evaluator);
-
-            final IChromosome sampleChromosome = new Chromosome(gaConf, new NeuralNetworkGene(gaConf),
-                    NeuroEvolutionaryAgentEvaluator.getAgent().getWeights().length);
-
-            gaConf.setSampleChromosome(sampleChromosome);
-            gaConf.setPopulationSize(poolSize);
-
-            genotype = Genotype.randomInitialGenotype(gaConf);
-
-        } catch (final InvalidConfigurationException e) {
-            e.printStackTrace();
+        for (int i = 0; i < poolSize; i++) {
+            mAgents.add(new ShimonsAgent());
         }
-
-        mGenotype = genotype;
-        mFitnessFunction = evaluator;
     }
 
     /**
-     * Evolve the current genotype
-     * 
-     * @param predictors
-     *            The used environments to evolve the agents against
-     * @return A list of evolved agents
+     * Evolves the current set of agents based on performance during previous tests.
      */
-    public void evolveAgents(final List<Predictor> predictors) {
-        mFitnessFunction.setPredictors(predictors);
+    public void evolveAgents() {
+        // Convert agents to chromosomes
+        final DoubleChromosomePopulation population = new DoubleChromosomePopulation(mAgents.size());
+        for (final ShimonsAgent agent : mAgents) {
+            population.addChromosome(new DoubleChromosome(agent.getWeights(), agent.getFitness()));
+        }
 
-        mGenotype.evolve();
+        // Evolve the chromosomes
+        final DoubleChromosomePopulation newPopulation = (DoubleChromosomePopulation) mGeneticAlgorithm
+                .nextGeneration(population);
 
-        System.out.println(mFitnessFunction.getAverageSteps());
+        // Apply chromosomes to agents
+        int i = 0;
+        for (final DoubleChromosome chromosome : newPopulation.getDoubleChromosomes()) {
+            mAgents.get(i++).setWeights(chromosome.getWeights());
+        }
     }
+
+    /**
+     * @return The agents that will be evolved
+     */
+    public List<ShimonsAgent> getAgents() {
+        return mAgents;
+    }
+
+    /**
+     * @return The average fitness of the agents determined by previously executed tests.
+     */
+    public double getAverageFitness() {
+        double fitness = 0;
+        for (final ShimonsAgent agent : mAgents) {
+            fitness += agent.getFitness();
+        }
+        return fitness / mAgents.size();
+    }
+
+    /**
+     * @return The average number of steps taken by the agents during previously executed tests.
+     */
+    public double getAverageNumSteps() {
+        double numSteps = 0;
+        for (final ShimonsAgent agent : mAgents) {
+            numSteps += agent.getAverageNumSteps();
+        }
+        return numSteps / mAgents.size();
+    }
+
 }

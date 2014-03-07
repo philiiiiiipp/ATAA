@@ -1,25 +1,20 @@
 package nl.uva.ataa.environment;
 
-import nl.uva.ataa.evolver.gene.NeuralNetworkGene;
 import nl.uva.ataa.utilities.Utilities;
 
 import org.apache.commons.math3.distribution.BetaDistribution;
-import org.jgap.IChromosome;
 
 public class BetaPredictor extends Predictor {
 
+    /** The weights representing 8 distributions */
     private final double[] mDistributionWeights = new double[16];
 
+    /**
+     * Creates a new predictor with random beta distributions.
+     */
     public BetaPredictor() {
         for (int i = 0; i < mDistributionWeights.length; ++i) {
             mDistributionWeights[i] = Utilities.RNG.nextDouble();
-        }
-    }
-
-    public BetaPredictor(final IChromosome chromosome) {
-        for (int i = 0; i < chromosome.getGenes().length; ++i) {
-            final NeuralNetworkGene superGene = (NeuralNetworkGene) chromosome.getGene(i);
-            mDistributionWeights[i] = superGene.doubleValue();
         }
     }
 

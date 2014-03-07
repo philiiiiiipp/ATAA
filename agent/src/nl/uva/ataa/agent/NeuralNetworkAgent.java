@@ -1,14 +1,7 @@
 package nl.uva.ataa.agent;
 
-import java.util.List;
-
 import nl.uva.ataa.EpisodeRunner;
-import nl.uva.ataa.environment.Predictor;
-import nl.uva.ataa.environment.WindEnvironment;
-import nl.uva.ataa.evolver.gene.NeuralNetworkGene;
-import nl.uva.ataa.utilities.Utilities;
 
-import org.jgap.IChromosome;
 import org.neuroph.core.Layer;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.Neuron;
@@ -22,16 +15,13 @@ import org.rlcommunity.rlglue.codec.types.Observation;
 public abstract class NeuralNetworkAgent implements AgentInterface {
 
     /** The neural network used to map observations to actions */
-    protected final NeuralNetwork<?> mNeuralNetwork = new NeuralNetwork<>();
+    private final NeuralNetwork<?> mNeuralNetwork = new NeuralNetwork<>();
 
-    protected List<Predictor> mPredictors;
-
-    /** The nr of episodes run during tests */
-    private int mNrEpisodes = 0;
-
+    /** The amount of episodes ran */
+    private int mNumEpisodes = 0;
+    /** The amount of steps taken */
     private int mNumSteps = 0;
-
-    /** The rewards that the agent has gathered during tests */
+    /** The rewards that the agent has gathered */
     private double mAccumulatedReward = 0.0;
 
     public NeuralNetworkAgent() {
@@ -190,23 +180,6 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     }
 
     /**
-     * Sets all the weights in the neural network.
-     * 
-     * @param weights
-     *            The weights ordered by connection
-     */
-    public void setWeights(final IChromosome chromosome) {
-        final double[] weights = new double[chromosome.getGenes().length];
-
-        for (int i = 0; i < chromosome.getGenes().length; ++i) {
-            final NeuralNetworkGene superGene = (NeuralNetworkGene) chromosome.getGene(i);
-            weights[i] = superGene.doubleValue();
-        }
-
-        setWeights(weights);
-    }
-
-    /**
      * Retrieves all the weights in the neural network.
      * 
      * @return The weights ordered by connection
@@ -239,46 +212,25 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
 
         final Action action = new Action();
         action.doubleArray = mNeuralNetwork.getOutput();
-        // System.out.println("A = " + Arrays.toString(action.doubleArray));
         return action;
     }
 
     /**
-     * Returns the fitness of the agent based on the last series of tests it has performed.
-     * 
-     * @return The agent's fitness
+     * @return The fitness of the agent based on the last series of tests it has performed.
      */
     public double getFitness() {
-        for (int i = 0; i < EpisodeRunner.ENVS_PER_EVALUATION; ++i) {
-            final Predictor predictor = mPredictors.get(Utilities.RNG.nextInt(mPredictors.size()));
-            final WindEnvironment environment = predictor.generateEnvironment();
-
-            agent_init(environment.env_init());
-
-            EpisodeRunner.run(environment, this);
-
-            mAccumulatedReward -= EpisodeRunner.MIN_REWARD;
-        }
-        final double fitness = mAccumulatedReward / mNrEpisodes;
-
-        // System.out.println("STEPS: " + ((int) (((double) mNrSteps / mNrEpisodes) * 100)) / 100.0);
-        // System.out.println("FITNS: " + fitness);
-
-        agent_cleanup();
-
-        return fitness;
+        return mAccumulatedReward / mNumEpisodes - EpisodeRunner.MIN_REWARD;
     }
 
-    public int getNumSteps() {
-        return mNumSteps;
+    /**
+     * @return The average number of steps taken per episode
+     */
+    public double getAverageNumSteps() {
+        return (double) mNumSteps / mNumEpisodes;
     }
 
     @Override
-    public void agent_init(final String taskSpec) {
-        mAccumulatedReward = 0.0;
-        mNrEpisodes = 0;
-        mNumSteps = 0;
-    }
+    public void agent_init(final String taskSpec) {}
 
     @Override
     public String agent_message(final String arg0) {
@@ -288,27 +240,29 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     @Override
     public Action agent_start(final Observation o) {
         ++mNumSteps;
+
         return getAction(o);
     }
 
     @Override
     public Action agent_step(final double reward, final Observation o) {
-        ++mNumSteps;
         mAccumulatedReward += reward;
+        ++mNumSteps;
+
         return getAction(o);
     }
 
     @Override
     public void agent_end(final double reward) {
         mAccumulatedReward += reward;
-        ++mNrEpisodes;
+        ++mNumEpisodes;
     }
 
     @Override
-    public void agent_cleanup() {}
-
-    public void setPredictors(final List<Predictor> predictors) {
-        mPredictors = predictors;
+    public void agent_cleanup() {
+        mAccumulatedReward = 0.0;
+        mNumEpisodes = 0;
+        mNumSteps = 0;
     }
 
 }

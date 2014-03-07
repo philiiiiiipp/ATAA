@@ -3,8 +3,10 @@ package nl.uva.ataa.agent;
 import java.util.List;
 
 import nl.uva.ataa.agent.genetic.gene.NeuralNetworkGene;
-import nl.uva.ataa.environment.EvolutionaryEnvironment;
-import nl.uva.glue.EpisodeRunner;
+import nl.uva.ataa.agent.utilities.Utilities;
+import nl.uva.ataa.environment.Predictor;
+import nl.uva.ataa.environment.WindEnvironment;
+import nl.uva.ataa.glue.EpisodeRunner;
 
 import org.jgap.IChromosome;
 import org.neuroph.core.Layer;
@@ -22,10 +24,12 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     /** The neural network used to map observations to actions */
     protected final NeuralNetwork<?> mNeuralNetwork = new NeuralNetwork<>();
 
-    protected List<EvolutionaryEnvironment> mEnvironments;
+    protected List<Predictor> mPredictors;
 
     /** The nr of episodes run during tests */
     private int mNrEpisodes = 0;
+
+    private int mNumSteps = 0;
 
     /** The rewards that the agent has gathered during tests */
     private double mAccumulatedReward = 0.0;
@@ -38,29 +42,6 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
      * Builds the neural network structure to map observations to actions.
      */
     protected abstract void buildNeuralNetwork();
-
-    /**
-     * Adds a layer to the neural network and adds a bias neuron to the previous layer which
-     * connects to every neuron in the new layer.
-     * 
-     * @param numNeurons
-     *            The amount of neurons in the new layer
-     * @param inputFunction
-     *            The input function to use for the neurons in the new layer
-     * @param transferFunction
-     *            The transfer function to use for the neurons in the new layer
-     */
-    protected void addLayerWithBias(final int numNeurons, final InputFunction inputFunction,
-            final TransferFunction transferFunction) {
-        final Neuron bias = new BiasNeuron();
-
-        final Layer layer = getLayer(numNeurons, inputFunction, transferFunction);
-        for (final Neuron neuron : layer.getNeurons()) {
-            neuron.addInputConnection(bias);
-        }
-
-        mNeuralNetwork.addLayer(layer);
-    }
 
     /**
      * Adds a layer to the neural network.
@@ -78,6 +59,21 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     }
 
     /**
+     * Adds a layer to the neural network and adds a bias neuron which connects to every neuron in the new layer.
+     * 
+     * @param numNeurons
+     *            The amount of neurons in the new layer
+     * @param inputFunction
+     *            The input function to use for the neurons in the new layer
+     * @param transferFunction
+     *            The transfer function to use for the neurons in the new layer
+     */
+    protected void addLayerWithBias(final int numNeurons, final InputFunction inputFunction,
+            final TransferFunction transferFunction) {
+        mNeuralNetwork.addLayer(getLayerWithBias(numNeurons, inputFunction, transferFunction));
+    }
+
+    /**
      * Sets the input layer for this neural network.
      * 
      * @param numNeurons
@@ -89,11 +85,9 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
      */
     protected void setInputLayer(final int numNeurons, final InputFunction inputFunction,
             final TransferFunction transferFunction) {
-        final Neuron[] neurons = new Neuron[numNeurons];
-        for (int i = 0; i < numNeurons; ++i) {
-            neurons[i] = new Neuron(inputFunction, transferFunction);
-        }
-        mNeuralNetwork.setInputNeurons(neurons);
+        final Layer layer = getLayer(numNeurons, inputFunction, transferFunction);
+        mNeuralNetwork.setInputNeurons(layer.getNeurons());
+        mNeuralNetwork.addLayer(0, layer);
     }
 
     /**
@@ -108,15 +102,9 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
      */
     protected void setOutputLayerWithBias(final int numNeurons, final InputFunction inputFunction,
             final TransferFunction transferFunction) {
-        final Neuron bias = new BiasNeuron();
-        mNeuralNetwork.getLayerAt(mNeuralNetwork.getLayersCount() - 1).addNeuron(bias);
-
-        final Neuron[] neurons = new Neuron[numNeurons];
-        for (int i = 0; i < numNeurons; ++i) {
-            neurons[i] = new Neuron(inputFunction, transferFunction);
-            neurons[i].addInputConnection(bias);
-        }
-        mNeuralNetwork.setOutputNeurons(neurons);
+        final Layer layer = getLayerWithBias(numNeurons, inputFunction, transferFunction);
+        mNeuralNetwork.setOutputNeurons(layer.getNeurons());
+        mNeuralNetwork.addLayer(layer);
     }
 
     /**
@@ -135,6 +123,28 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
         for (int i = 0; i < numNeurons; ++i) {
             layer.addNeuron(new Neuron(inputFunction, transferFunction));
         }
+        return layer;
+    }
+
+    /**
+     * Creates a layer with a bias neuron which connects to every neuron in the layer.
+     * 
+     * @param numNeurons
+     *            The amount of neurons in the new layer
+     * @param inputFunction
+     *            The input function to use for the neurons in the new layer
+     * @param transferFunction
+     *            The transfer function to use for the neurons in the new layer
+     */
+    protected Layer getLayerWithBias(final int numNeurons, final InputFunction inputFunction,
+            final TransferFunction transferFunction) {
+        final Neuron bias = new BiasNeuron();
+
+        final Layer layer = getLayer(numNeurons, inputFunction, transferFunction);
+        for (final Neuron neuron : layer.getNeurons()) {
+            neuron.addInputConnection(bias);
+        }
+
         return layer;
     }
 
@@ -166,15 +176,7 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
      * @return The neuron
      */
     private Neuron getNeuron(final int layer, final int neuron) {
-        if (layer == 0) {
-            return mNeuralNetwork.getInputNeurons()[neuron];
-        }
-
-        if (layer == mNeuralNetwork.getLayersCount() + 1) {
-            return mNeuralNetwork.getOutputNeurons()[neuron];
-        }
-
-        return mNeuralNetwork.getLayerAt(layer - 1).getNeuronAt(neuron);
+        return mNeuralNetwork.getLayerAt(layer).getNeuronAt(neuron);
     }
 
     /**
@@ -237,6 +239,7 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
 
         final Action action = new Action();
         action.doubleArray = mNeuralNetwork.getOutput();
+        // System.out.println("A = " + Arrays.toString(action.doubleArray));
         return action;
     }
 
@@ -246,25 +249,36 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
      * @return The agent's fitness
      */
     public double getFitness() {
-        for (final EvolutionaryEnvironment environment : mEnvironments) {
+        for (int i = 0; i < EpisodeRunner.ENVS_PER_EVALUATION; ++i) {
+            final Predictor predictor = mPredictors.get(Utilities.RNG.nextInt(mPredictors.size()));
+            final WindEnvironment environment = predictor.generateEnvironment();
+
             agent_init(environment.env_init());
 
             EpisodeRunner.run(environment, this);
 
-            mAccumulatedReward -= environment.getMinimimReward();
+            mAccumulatedReward -= EpisodeRunner.MIN_REWARD;
         }
+        final double fitness = mAccumulatedReward / mNrEpisodes;
 
-        return mAccumulatedReward / mNrEpisodes;
+        // System.out.println("STEPS: " + ((int) (((double) mNrSteps / mNrEpisodes) * 100)) / 100.0);
+        // System.out.println("FITNS: " + fitness);
+
+        agent_cleanup();
+
+        return fitness;
+    }
+
+    public int getNumSteps() {
+        return mNumSteps;
     }
 
     @Override
-    public void agent_cleanup() {
+    public void agent_init(final String taskSpec) {
         mAccumulatedReward = 0.0;
         mNrEpisodes = 0;
+        mNumSteps = 0;
     }
-
-    @Override
-    public void agent_init(final String taskSpec) {}
 
     @Override
     public String agent_message(final String arg0) {
@@ -273,11 +287,13 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
 
     @Override
     public Action agent_start(final Observation o) {
+        ++mNumSteps;
         return getAction(o);
     }
 
     @Override
     public Action agent_step(final double reward, final Observation o) {
+        ++mNumSteps;
         mAccumulatedReward += reward;
         return getAction(o);
     }
@@ -285,10 +301,14 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     @Override
     public void agent_end(final double reward) {
         mAccumulatedReward += reward;
+        ++mNrEpisodes;
     }
 
-    public void setEnvironments(final List<EvolutionaryEnvironment> list) {
-        mEnvironments = list;
+    @Override
+    public void agent_cleanup() {}
+
+    public void setPredictors(final List<Predictor> predictors) {
+        mPredictors = predictors;
     }
 
 }

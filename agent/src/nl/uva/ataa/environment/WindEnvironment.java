@@ -3,12 +3,11 @@ package nl.uva.ataa.environment;
 import java.util.Random;
 
 import org.rlcommunity.environment.helicopter.Helicopter;
-import org.rlcommunity.environment.helicopter.HelicopterState;
 import org.rlcommunity.rlglue.codec.types.Action;
 import org.rlcommunity.rlglue.codec.types.Observation;
 import org.rlcommunity.rlglue.codec.types.Reward_observation_terminal;
 
-public class EvolutionaryEnvironment extends Helicopter {
+public class WindEnvironment extends Helicopter {
 
     /** The rewards that the environment has given during tests */
     private double mAccumulatedReward = 0.0;
@@ -19,7 +18,7 @@ public class EvolutionaryEnvironment extends Helicopter {
     /**
      * Creates an environment with random wind settings
      */
-    public EvolutionaryEnvironment() {
+    public WindEnvironment() {
         final Random rand = new Random();
         setWindWaveNS(rand.nextDouble(), rand.nextDouble(), rand.nextDouble(), rand.nextDouble());
         setWindWaveEW(rand.nextDouble(), rand.nextDouble(), rand.nextDouble(), rand.nextDouble());
@@ -33,7 +32,7 @@ public class EvolutionaryEnvironment extends Helicopter {
      * @param windEW
      *            Wind for the East-West-axis
      */
-    public EvolutionaryEnvironment(final Wind windNS, final Wind windEW) {
+    public WindEnvironment(final Wind windNS, final Wind windEW) {
         setWindWaveNS(windNS.getMaxStr(), windNS.getHz(), windNS.getPhase(), windNS.getCenterAmp());
         setWindWaveEW(windEW.getMaxStr(), windEW.getHz(), windEW.getPhase(), windEW.getCenterAmp());
     }
@@ -65,24 +64,5 @@ public class EvolutionaryEnvironment extends Helicopter {
      */
     public double getFitness() {
         return -mAccumulatedReward / mNrEpisodes;
-    }
-
-    /**
-     * Calculates the worst reward that's possible to get in an episode.
-     * 
-     * @return The minimum reward
-     */
-    public double getMinimimReward() {
-        return -3.0f
-                * HelicopterState.MAX_POS
-                * HelicopterState.MAX_POS
-                + -3.0f
-                * HelicopterState.MAX_RATE
-                * HelicopterState.MAX_RATE
-                + -3.0f
-                * HelicopterState.MAX_VEL
-                * HelicopterState.MAX_VEL
-                - (1.0f - HelicopterState.MIN_QW_BEFORE_HITTING_TERMINAL_STATE
-                        * HelicopterState.MIN_QW_BEFORE_HITTING_TERMINAL_STATE);
     }
 }

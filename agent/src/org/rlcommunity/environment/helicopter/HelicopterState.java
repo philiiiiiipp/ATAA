@@ -74,7 +74,7 @@ public class HelicopterState {
     // integrate at 100Hz for simulating the dynamics]:
     public final double DT_CONTROL = .1;
     // after 6000 steps we automatically enter the terminal state:
-    public final static int NUM_SIM_STEPS_PER_EPISODE = 6000;
+    // public final static int NUM_SIM_STEPS_PER_EPISODE = 6000; See EpisodeRunner instead
 
     // Internal Helicopter state variables:
     public HeliVector velocity = new HeliVector(0.0d, 0.0d, 0.0d);
@@ -129,8 +129,8 @@ public class HelicopterState {
     }
 
     /**
-     * Enforces observation constraints (if anything falls outside the min/max bounds, it is reset
-     * to the nearest boundary value).
+     * Enforces observation constraints (if anything falls outside the min/max bounds, it is reset to the nearest
+     * boundary value).
      */
     private void enforceObservationConstraints(final double observationDoubles[]) {
         for (int i = 0; i < NUMOBS; ++i) {
@@ -140,14 +140,13 @@ public class HelicopterState {
     }
 
     /**
-     * Return an Observation object, which is the "error state" (i.e., amount of deviation from the
-     * goal state). Observation is the error state in the helicopter's coordinate system so that
-     * errors/observations can be mapped more directly to actions.
+     * Return an Observation object, which is the "error state" (i.e., amount of deviation from the goal state).
+     * Observation is the error state in the helicopter's coordinate system so that errors/observations can be mapped
+     * more directly to actions.
      * 
-     * Observation (12 vars) consists of: u, v, w : velocities in helicopter frame xerr, yerr, zerr
-     * : position error expressed in frame attached to helicopter [xyz correspond to ned when
-     * helicopter is in neutral orientation, level and facing north p, q, r : angular rate of change
-     * qx, qy, qz : quaternions representing helicopter's rotation
+     * Observation (12 vars) consists of: u, v, w : velocities in helicopter frame xerr, yerr, zerr : position error
+     * expressed in frame attached to helicopter [xyz correspond to ned when helicopter is in neutral orientation, level
+     * and facing north p, q, r : angular rate of change qx, qy, qz : quaternions representing helicopter's rotation
      */
     public Observation makeObservation() {
         final Observation o = new Observation(0, NUMOBS);

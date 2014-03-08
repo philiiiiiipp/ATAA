@@ -1,5 +1,8 @@
 package nl.uva.ataa.environment;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.rlcommunity.rlglue.codec.EnvironmentInterface;
 import org.rlcommunity.rlglue.codec.types.Action;
 import org.rlcommunity.rlglue.codec.types.Observation;
@@ -10,11 +13,14 @@ public abstract class Predictor implements EnvironmentInterface {
     /** The environment used for tests in the current episode */
     private WindEnvironment mCurrentEnvironment;
 
+    private final List<Double> mEpisodeRewards = new LinkedList<>();
+    private double mEpisodeReward = 0.0;
+
     /** The rewards that the environment has given during tests */
     private double mAccumulatedReward = 0.0;
 
-    /** The nr of episodes run during tests */
-    private int mNrEpisodes = 0;
+    /** The amount of episodes ran */
+    private int mNumEpisodes = 0;
 
     /**
      * Generates a random environment, based on the implementation's distribution. The new environment will be used in
@@ -39,6 +45,8 @@ public abstract class Predictor implements EnvironmentInterface {
 
     @Override
     public String env_init() {
+        mEpisodeReward = 0.0;
+
         generateNewEnvironment();
 
         return mCurrentEnvironment.env_init();
@@ -46,7 +54,7 @@ public abstract class Predictor implements EnvironmentInterface {
 
     @Override
     public Observation env_start() {
-        mNrEpisodes++;
+        ++mNumEpisodes;
 
         return mCurrentEnvironment.env_start();
     }
@@ -55,15 +63,22 @@ public abstract class Predictor implements EnvironmentInterface {
     public Reward_observation_terminal env_step(final Action action) {
         final Reward_observation_terminal rewObs = mCurrentEnvironment.env_step(action);
 
-        mAccumulatedReward += rewObs.getReward();
+        mEpisodeReward += rewObs.getReward();
+
+        // Make note of the reward this run
+        if (rewObs.isTerminal()) {
+            mEpisodeRewards.add(mEpisodeReward);
+            mAccumulatedReward += mEpisodeReward;
+        }
 
         return rewObs;
     }
 
     @Override
     public void env_cleanup() {
+        mEpisodeReward = 0.0;
         mAccumulatedReward = 0.0;
-        mNrEpisodes = 0;
+        mNumEpisodes = 0;
 
         if (mCurrentEnvironment != null) {
             mCurrentEnvironment.env_cleanup();
@@ -75,12 +90,16 @@ public abstract class Predictor implements EnvironmentInterface {
         return mCurrentEnvironment.env_message(theMessage);
     }
 
-    /**
-     * Returns the fitness of the environment based on the last series of tests it has performed.
-     * 
-     * @return The environments's fitness
-     */
-    public double getFitness() {
-        return -mAccumulatedReward / mNrEpisodes;
+    public List<Double> getEpisodeRewards() {
+        return mEpisodeRewards;
     }
+
+    public double getAccumulatedReward() {
+        return mAccumulatedReward;
+    }
+
+    public int getNumEpisodes() {
+        return mNumEpisodes;
+    }
+
 }

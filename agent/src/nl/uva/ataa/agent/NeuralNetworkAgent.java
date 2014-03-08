@@ -1,7 +1,5 @@
 package nl.uva.ataa.agent;
 
-import nl.uva.ataa.EpisodeRunner;
-
 import org.neuroph.core.Layer;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.Neuron;
@@ -216,10 +214,10 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     }
 
     /**
-     * @return The fitness of the agent based on the last series of tests it has performed.
+     * @return The average reward of the agent based on the last series of tests it has performed.
      */
-    public double getFitness() {
-        return mAccumulatedReward / mNumEpisodes - EpisodeRunner.MIN_REWARD;
+    public double getAverageReward() {
+        return mAccumulatedReward / mNumEpisodes;
     }
 
     /**

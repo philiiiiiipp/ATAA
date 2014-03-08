@@ -1,13 +1,21 @@
 package nl.uva.ataa.environment;
 
+import nl.uva.ataa.evolver.genetic.ChromosomeSpecimen;
+import nl.uva.ataa.evolver.genetic.DoubleLimitChromosome;
+import nl.uva.ataa.evolver.genetic.DoubleLimitMutationPolicy;
 import nl.uva.ataa.utilities.Utilities;
 
 import org.apache.commons.math3.distribution.BetaDistribution;
+import org.apache.commons.math3.genetics.Chromosome;
+import org.apache.commons.math3.genetics.MutationPolicy;
 
-public class BetaPredictor extends Predictor {
+/**
+ * A predictor that uses beta destributions to generate the winds within environments. It can be evolved.
+ */
+public abstract class BetaPredictor extends Predictor implements ChromosomeSpecimen {
 
     /** The weights representing 8 distributions */
-    private final double[] mDistributionWeights = new double[16];
+    public Double[] mDistributionWeights = new Double[16];
 
     /**
      * Creates a new predictor with random beta distributions.
@@ -27,5 +35,21 @@ public class BetaPredictor extends Predictor {
     private double getSample(final double alpha, final double beta) {
         final BetaDistribution betaDist = new BetaDistribution(alpha, beta);
         return betaDist.cumulativeProbability(Utilities.RNG.nextDouble());
+    }
+
+    @Override
+    public Chromosome getChromosome() {
+        final double fitness = (getNumEpisodes() > 0 ? getFitness() : ChromosomeSpecimen.NO_FITNESS);
+        return new DoubleLimitChromosome(mDistributionWeights, fitness, 0, 1, false, true);
+    }
+
+    @Override
+    public void setChromosome(final Chromosome chromosome) {
+        mDistributionWeights = ((DoubleLimitChromosome) chromosome).getWeights();
+    }
+
+    @Override
+    public MutationPolicy getMutationPolicy(final double mutationRange) {
+        return new DoubleLimitMutationPolicy(mutationRange);
     }
 }

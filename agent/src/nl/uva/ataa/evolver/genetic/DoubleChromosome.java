@@ -1,5 +1,6 @@
 package nl.uva.ataa.evolver.genetic;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.math3.genetics.AbstractListChromosome;
@@ -10,15 +11,7 @@ import org.apache.commons.math3.genetics.InvalidRepresentationException;
  */
 public class DoubleChromosome extends AbstractListChromosome<Double> {
 
-    /** Fitness used when the fitness has not been determined */
-    private static final double NO_FITNESS = Double.NEGATIVE_INFINITY;
-
     private final double mFitness;
-
-    public DoubleChromosome(final Double[] representation, final double fitness) throws InvalidRepresentationException {
-        super(representation);
-        mFitness = fitness;
-    }
 
     public DoubleChromosome(final List<Double> representation, final double fitness)
             throws InvalidRepresentationException {
@@ -26,12 +19,16 @@ public class DoubleChromosome extends AbstractListChromosome<Double> {
         mFitness = fitness;
     }
 
+    public DoubleChromosome(final Double[] representation, final double fitness) throws InvalidRepresentationException {
+        this(Arrays.asList(representation), fitness);
+    }
+
     @Override
     public double fitness() {
         return mFitness;
     }
 
-    public double[] getWeights() {
+    public double[] getPrimitiveWeights() {
         final List<Double> representation = getRepresentation();
         final double[] weights = new double[representation.size()];
 
@@ -42,6 +39,11 @@ public class DoubleChromosome extends AbstractListChromosome<Double> {
         return weights;
     }
 
+    public Double[] getWeights() {
+        final List<Double> representation = getRepresentation();
+        return representation.toArray(new Double[representation.size()]);
+    }
+
     @Override
     public List<Double> getRepresentation() {
         return super.getRepresentation();
@@ -49,7 +51,7 @@ public class DoubleChromosome extends AbstractListChromosome<Double> {
 
     @Override
     public AbstractListChromosome<Double> newFixedLengthChromosome(final List<Double> chromosomeRepresentation) {
-        return new DoubleChromosome(chromosomeRepresentation, NO_FITNESS);
+        return new DoubleChromosome(chromosomeRepresentation, ChromosomeSpecimen.NO_FITNESS);
     }
 
     @Override

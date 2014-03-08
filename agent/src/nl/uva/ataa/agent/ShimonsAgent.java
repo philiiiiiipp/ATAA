@@ -3,11 +3,16 @@ package nl.uva.ataa.agent;
 import nl.uva.ataa.agent.neuronfunctions.SigmoidTransferFunction;
 import nl.uva.ataa.agent.neuronfunctions.SumInputFunction;
 import nl.uva.ataa.agent.neuronfunctions.SumTransferFunction;
+import nl.uva.ataa.evolver.genetic.ChromosomeSpecimen;
+import nl.uva.ataa.evolver.genetic.DoubleChromosome;
+import nl.uva.ataa.evolver.genetic.DoubleMutationPolicy;
 
+import org.apache.commons.math3.genetics.Chromosome;
+import org.apache.commons.math3.genetics.MutationPolicy;
 import org.neuroph.core.input.InputFunction;
 import org.neuroph.core.transfer.TransferFunction;
 
-public class ShimonsAgent extends NeuralNetworkAgent {
+public class ShimonsAgent extends NeuralNetworkAgent implements ChromosomeSpecimen {
 
     /** The response for the sigmoid in the transfer function */
     private static final double SIGMOID_RESPONSE = 4.924273;
@@ -73,6 +78,26 @@ public class ShimonsAgent extends NeuralNetworkAgent {
     @Override
     protected double[] getInput(final double[] o) {
         return new double[] { o[3], o[0], o[10], o[4], o[1], o[9], o[11], o[5], o[2] };
+    }
+
+    @Override
+    public double getFitness() {
+        return getAverageReward();
+    }
+
+    @Override
+    public Chromosome getChromosome() {
+        return new DoubleChromosome(getWeights(), getFitness());
+    }
+
+    @Override
+    public void setChromosome(final Chromosome chromosome) {
+        setWeights(((DoubleChromosome) chromosome).getPrimitiveWeights());
+    }
+
+    @Override
+    public MutationPolicy getMutationPolicy(final double mutationRange) {
+        return new DoubleMutationPolicy(mutationRange);
     }
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Locale;
 
 import nl.uva.ataa.agent.ShimonsAgent;
+import nl.uva.ataa.environment.BetaPredictor;
 import nl.uva.ataa.environment.Predictor;
 import nl.uva.ataa.evolver.AgentEvolver;
 import nl.uva.ataa.evolver.PredictorEvolver;
@@ -20,12 +21,16 @@ public class EpisodeRunner {
     private static final int NUM_PREDICTORS = 10;
     /** The amount of agents to evolve */
     private static final int NUM_AGENTS = 50;
+
     /** The amount of environments tested per agent per generation */
-    private static final int ENVIRONMENTS_PER_EVALUATION = 20;
+    private static final int ENVIRONMENTS_PER_EVALUATION = 50;
     /** The amount of generations to evolve */
     private static final int NUM_GENERATIONS = 100;
     /** The maximum length of an episode */
     public static final int EPISODE_LENGTH = 1000;
+
+    /** The type of predictor to test */
+    private static final PredictorEvolver.Type PREDICTOR_TYPE = PredictorEvolver.Type.REWARD;
 
     /** The minimum possible reward after an episode */
     public static final double MIN_REWARD = (-3.0f * HelicopterState.MAX_POS * HelicopterState.MAX_POS + -3.0f
@@ -36,11 +41,11 @@ public class EpisodeRunner {
 
     public static void main(final String[] args) {
 
-        final PredictorEvolver predictorEvolver = new PredictorEvolver(NUM_PREDICTORS);
+        final PredictorEvolver predictorEvolver = new PredictorEvolver(NUM_PREDICTORS, PREDICTOR_TYPE);
         final AgentEvolver agentEvolver = new AgentEvolver(NUM_AGENTS);
 
-        final List<Predictor> predictors = predictorEvolver.getPredictors();
-        final List<ShimonsAgent> agents = agentEvolver.getAgents();
+        final List<BetaPredictor> predictors = predictorEvolver.getSpecimens();
+        final List<ShimonsAgent> agents = agentEvolver.getSpecimens();
 
         for (int generation = 0; generation < NUM_GENERATIONS; generation++) {
 
@@ -69,15 +74,16 @@ public class EpisodeRunner {
                 }
             }
 
-            // Print score
+            // Print scores
             System.out.println(Math.round(agentEvolver.getAverageFitness()) + " - "
-                    + String.format(Locale.ENGLISH, "%.2f", agentEvolver.getAverageNumSteps()));
+                    + String.format(Locale.ENGLISH, "%.2f", agentEvolver.getAverageNumSteps()) + "     -----     "
+                    + Math.round(predictorEvolver.getAverageFitness()));
 
-            // Evolve the parties
-            predictorEvolver.evolvePredictors();
-            agentEvolver.evolveAgents();
+            // Evolve the specimens
+            predictorEvolver.evolve();
+            agentEvolver.evolve();
 
-            // Clean up the parties
+            // Clean up the specimens
             for (final Predictor predictor : predictors) {
                 predictor.env_cleanup();
             }

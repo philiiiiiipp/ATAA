@@ -6,6 +6,8 @@ import java.util.Locale;
 import nl.uva.ataa.agent.ShimonsAgent;
 import nl.uva.ataa.environment.BetaPredictor;
 import nl.uva.ataa.environment.Predictor;
+import nl.uva.ataa.environment.fitness.FitnessFunction;
+import nl.uva.ataa.environment.fitness.RewardFitness;
 import nl.uva.ataa.evolver.AgentEvolver;
 import nl.uva.ataa.evolver.PredictorEvolver;
 import nl.uva.ataa.utilities.Utilities;
@@ -18,19 +20,19 @@ import org.rlcommunity.rlglue.codec.types.Reward_observation_terminal;
 public class EpisodeRunner {
 
     /** The amount of predictors to evolve */
-    private static final int NUM_PREDICTORS = 10;
+    private static final int NUM_PREDICTORS = 20;
     /** The amount of agents to evolve */
-    private static final int NUM_AGENTS = 50;
+    private static final int NUM_AGENTS = 40;
 
     /** The amount of environments tested per agent per generation */
-    private static final int ENVIRONMENTS_PER_EVALUATION = 50;
+    private static final int ENVIRONMENTS_PER_EVALUATION = 30;
     /** The amount of generations to evolve */
     private static final int NUM_GENERATIONS = 100;
     /** The maximum length of an episode */
     public static final int EPISODE_LENGTH = 1000;
 
-    /** The type of predictor to test */
-    private static final PredictorEvolver.Type PREDICTOR_TYPE = PredictorEvolver.Type.REWARD;
+    /** The fitness function to test the predictor with */
+    private static final FitnessFunction PREDICTOR_FITNESS = new RewardFitness();
 
     /** The minimum possible reward after an episode */
     public static final double MIN_REWARD = (-3.0f * HelicopterState.MAX_POS * HelicopterState.MAX_POS + -3.0f
@@ -41,7 +43,7 @@ public class EpisodeRunner {
 
     public static void main(final String[] args) {
 
-        final PredictorEvolver predictorEvolver = new PredictorEvolver(NUM_PREDICTORS, PREDICTOR_TYPE);
+        final PredictorEvolver predictorEvolver = new PredictorEvolver(NUM_PREDICTORS, PREDICTOR_FITNESS);
         final AgentEvolver agentEvolver = new AgentEvolver(NUM_AGENTS);
 
         final List<BetaPredictor> predictors = predictorEvolver.getSpecimens();

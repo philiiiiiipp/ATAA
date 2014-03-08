@@ -1,5 +1,6 @@
 package nl.uva.ataa.environment;
 
+import nl.uva.ataa.environment.fitness.FitnessFunction;
 import nl.uva.ataa.evolver.genetic.ChromosomeSpecimen;
 import nl.uva.ataa.evolver.genetic.DoubleLimitChromosome;
 import nl.uva.ataa.evolver.genetic.DoubleLimitMutationPolicy;
@@ -12,18 +13,27 @@ import org.apache.commons.math3.genetics.MutationPolicy;
 /**
  * A predictor that uses beta destributions to generate the winds within environments. It can be evolved.
  */
-public abstract class BetaPredictor extends Predictor implements ChromosomeSpecimen {
+public class BetaPredictor extends Predictor implements ChromosomeSpecimen {
 
     /** The weights representing 8 distributions */
     public Double[] mDistributionWeights = new Double[16];
 
+    private final FitnessFunction mFitnessFunction;
+
     /**
      * Creates a new predictor with random beta distributions.
      */
-    public BetaPredictor() {
+    public BetaPredictor(final FitnessFunction fitnessFunction) {
+        mFitnessFunction = fitnessFunction;
+
         for (int i = 0; i < mDistributionWeights.length; ++i) {
             mDistributionWeights[i] = Utilities.RNG.nextDouble();
         }
+    }
+
+    @Override
+    public double getFitness() {
+        return mFitnessFunction.getFitness(this);
     }
 
     @Override

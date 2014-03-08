@@ -1,19 +1,10 @@
 package nl.uva.ataa.evolver;
 
 import nl.uva.ataa.environment.BetaPredictor;
-import nl.uva.ataa.environment.betapredictors.RewardBetaPredictor;
-import nl.uva.ataa.environment.betapredictors.VarianceBetaPredictor;
+import nl.uva.ataa.environment.fitness.FitnessFunction;
 import nl.uva.ataa.utilities.Conf;
 
 public class PredictorEvolver extends Evolver<BetaPredictor> {
-
-    /**
-     * The possible types of BetaPredictors to evolve.
-     */
-    public enum Type {
-        REWARD,
-        VARIANCE;
-    }
 
     /** The chance that two chromosomes will mate */
     private static final double CROSSOVER_RATE = 0.8;
@@ -35,25 +26,17 @@ public class PredictorEvolver extends Evolver<BetaPredictor> {
      * 
      * @param poolSize
      *            The amount of predictors to evolve
-     * @param type
-     *            The type of predictor to test
+     * @param fitnessFunction
+     *            The fitness function to test the predictor with
      */
-    public PredictorEvolver(final int poolSize, final Type type) {
+    public PredictorEvolver(final int poolSize, final FitnessFunction fitnessFunction) {
         super(poolSize, CROSSOVER_RATE, CROSSOVER_RATIO, MUTATION_RATE, MUTATION_RANGE, TOURNAMENT_SIZE, ELITISM_RATE,
-                new Conf("type", type));
+                new Conf("ff", fitnessFunction));
     }
 
     @Override
     protected BetaPredictor getSpecimen(final Conf conf) {
-        final Type type = (Type) conf.get("type");
-        switch (type) {
-            case REWARD:
-                return new RewardBetaPredictor();
-            case VARIANCE:
-                return new VarianceBetaPredictor();
-            default:
-                throw new RuntimeException("Unknown predictor type: " + type);
-        }
+        return new BetaPredictor((FitnessFunction) conf.get("ff"));
     }
 
 }

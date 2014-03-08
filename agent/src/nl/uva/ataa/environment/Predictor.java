@@ -13,7 +13,10 @@ public abstract class Predictor implements EnvironmentInterface {
     /** The environment used for tests in the current episode */
     private WindEnvironment mCurrentEnvironment;
 
+    /** The rewards given per episode */
     private final List<Double> mEpisodeRewards = new LinkedList<>();
+
+    /** The rewards given in the current episode */
     private double mEpisodeReward = 0.0;
 
     /** The rewards that the environment has given during tests */
@@ -90,14 +93,23 @@ public abstract class Predictor implements EnvironmentInterface {
         return mCurrentEnvironment.env_message(theMessage);
     }
 
+    /**
+     * @return The rewards given per episode
+     */
     public List<Double> getEpisodeRewards() {
         return mEpisodeRewards;
     }
 
+    /**
+     * @return The rewards that the environment has given during tests
+     */
     public double getAccumulatedReward() {
         return mAccumulatedReward;
     }
 
+    /**
+     * @return The amount of episodes ran
+     */
     public int getNumEpisodes() {
         return mNumEpisodes;
     }

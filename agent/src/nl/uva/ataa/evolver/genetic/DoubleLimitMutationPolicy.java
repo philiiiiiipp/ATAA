@@ -12,14 +12,14 @@ import org.apache.commons.math3.genetics.MutationPolicy;
 
 public class DoubleLimitMutationPolicy implements MutationPolicy {
 
-    /** The range that a gene can maximaly mutate */
+    /** The range that a gene can maximally mutate */
     final double mMutationRange;
 
     /**
      * Creates a new mutation policy.
      * 
      * @param mutationRange
-     *            The range that a gene can maximaly mutate
+     *            The range that a gene can maximally mutate
      */
     public DoubleLimitMutationPolicy(final double mutationRange) {
         mMutationRange = mutationRange;

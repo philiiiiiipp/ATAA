@@ -34,7 +34,7 @@ public interface ChromosomeSpecimen {
      * Constructs a mutation policy that can be applied to the specimen's chromosome type.
      * 
      * @param mutationRange
-     *            The range that a gene can maximaly mutate
+     *            The range that a gene can maximally mutate
      * 
      * @return A new mutation policy
      */

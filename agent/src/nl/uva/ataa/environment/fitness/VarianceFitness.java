@@ -1,7 +1,5 @@
 package nl.uva.ataa.environment.fitness;
 
-import java.util.List;
-
 import nl.uva.ataa.environment.Predictor;
 
 /**
@@ -11,9 +9,24 @@ public class VarianceFitness implements FitnessFunction {
 
     @Override
     public double getFitness(final Predictor predictor) {
-        final List<Double> episodeRewards = predictor.getEpisodeRewards();
-
-        return -predictor.getAccumulatedReward() / predictor.getNumEpisodes();
+        return getPredictorVariance(predictor);
     }
 
+    public double getPredictorVariance(final Predictor predictor) {
+        double sum = 0;
+        double var = 0;
+        double mean = 0;
+        final int n = predictor.getNumEpisodes();
+
+        for (double i : predictor.getEpisodeRewards()) {
+            sum += i;
+        }
+
+        mean = sum / n;
+
+        for (double i : predictor.getEpisodeRewards()) {
+            var += Math.pow((i - mean), 2);
+        }
+        return var / n;
+    }
 }

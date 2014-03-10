@@ -26,8 +26,8 @@ public abstract class Predictor implements EnvironmentInterface {
     private int mNumEpisodes = 0;
 
     /**
-     * Generates a random environment, based on the implementation's distribution. The new environment will be used in
-     * the next episode.
+     * Generates a random environment, based on the implementation's distribution. The new
+     * environment will be used in the next episode.
      * 
      * @return A random environment
      */
@@ -41,7 +41,8 @@ public abstract class Predictor implements EnvironmentInterface {
      * Must return a sample in [0, 1] to be used as a wind parameter.
      * 
      * @param index
-     *            The index of the sample, ranging from 0 to 7, corresponding to the the two winds' parameters
+     *            The index of the sample, ranging from 0 to 7, corresponding to the the two winds'
+     *            parameters
      * @return A sample in [0, 1]
      */
     protected abstract double getSample(final int index);
@@ -82,6 +83,7 @@ public abstract class Predictor implements EnvironmentInterface {
         mEpisodeReward = 0.0;
         mAccumulatedReward = 0.0;
         mNumEpisodes = 0;
+        mEpisodeRewards.clear();
 
         if (mCurrentEnvironment != null) {
             mCurrentEnvironment.env_cleanup();

@@ -38,7 +38,7 @@ public class KurtosisFitness extends VarianceFitness {
 
         for (double i : episodeRewards) {
             numerator += Math.pow((i - mean), 4);
-            denominator += Math.pow((1 / n * Math.pow(sd, 2)), 2);
+            denominator += Math.pow(Math.pow(sd, 2) / n, 2);
         }
 
         return (numerator / n) / denominator - 3;

@@ -7,7 +7,7 @@ import nl.uva.ataa.agent.ShimonsAgent;
 import nl.uva.ataa.environment.BetaPredictor;
 import nl.uva.ataa.environment.Predictor;
 import nl.uva.ataa.environment.fitness.FitnessFunction;
-import nl.uva.ataa.environment.fitness.VarianceFitness;
+import nl.uva.ataa.environment.fitness.KurtosisFitness;
 import nl.uva.ataa.evolver.AgentEvolver;
 import nl.uva.ataa.evolver.PredictorEvolver;
 import nl.uva.ataa.utilities.Utilities;
@@ -32,7 +32,7 @@ public class EpisodeRunner {
     public static final int EPISODE_LENGTH = 1000;
 
     /** The fitness function to test the predictor with */
-    private static final FitnessFunction PREDICTOR_FITNESS = new VarianceFitness();
+    private static final FitnessFunction PREDICTOR_FITNESS = new KurtosisFitness();
 
     /** The minimum possible reward after an episode */
     public static final double MIN_REWARD = (-3.0f * HelicopterState.MAX_POS * HelicopterState.MAX_POS + -3.0f

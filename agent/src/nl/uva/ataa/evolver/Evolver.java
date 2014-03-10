@@ -34,9 +34,9 @@ public abstract class Evolver<T extends ChromosomeSpecimen> {
      * @param crossoverRatio
      *            The ratio between parents' genes during mating
      * @param mutationRate
-     *            The range that a gene can maximaly mutate
+     *            The range that a gene can maximally mutate
      * @param mutationRange
-     *            The range that a gene can maximaly mutate
+     *            The range that a gene can maximally mutate
      * @param tournamentSize
      *            The amount of chromosomes that compete for reproduction
      * @param elitismRate

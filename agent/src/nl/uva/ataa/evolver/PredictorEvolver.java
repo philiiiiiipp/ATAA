@@ -13,7 +13,7 @@ public class PredictorEvolver extends Evolver<BetaPredictor> {
 
     /** The chance that a chromosome will mutate one of its genes */
     private static final double MUTATION_RATE = 0.8;
-    /** The range that a gene can maximaly mutate */
+    /** The range that a gene can maximally mutate */
     private static final double MUTATION_RANGE = 0.2;
 
     /** The amount of chromosomes that compete for reproduction */

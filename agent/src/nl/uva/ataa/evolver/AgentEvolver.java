@@ -12,7 +12,7 @@ public class AgentEvolver extends Evolver<ShimonsAgent> {
 
     /** The chance that a chromosome will mutate one of its genes */
     private static final double MUTATION_RATE = 0.5;
-    /** The range that a gene can maximaly mutate */
+    /** The range that a gene can maximally mutate */
     private static final double MUTATION_RANGE = 1.5;
 
     /** The amount of chromosomes that compete for reproduction */

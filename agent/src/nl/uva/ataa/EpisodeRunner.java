@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Locale;
 
 import nl.uva.ataa.agent.ShimonsAgent;
+import nl.uva.ataa.environment.BaselinePredictor;
 import nl.uva.ataa.environment.BetaPredictor;
 import nl.uva.ataa.environment.Predictor;
 import nl.uva.ataa.environment.fitness.FitnessFunction;
@@ -48,8 +49,15 @@ public class EpisodeRunner {
 
         final List<BetaPredictor> predictors = predictorEvolver.getSpecimens();
         final List<ShimonsAgent> agents = agentEvolver.getSpecimens();
+        final List<BaselinePredictor> baselinePredictors = BaselinePredictor.getAllBaselines();
 
+        long lastBaselineReward = 0;
         for (int generation = 0; generation < NUM_GENERATIONS; generation++) {
+
+            long averageBaselineReward = runBaselineTest(baselinePredictors, agents);
+            System.out.println("Baseline average reward over " + baselinePredictors.size() + " environments: "
+                    + averageBaselineReward + " diff: " + (averageBaselineReward - lastBaselineReward));
+            lastBaselineReward = averageBaselineReward;
 
             // Performs tests for each agent
             for (final ShimonsAgent agent : agents) {
@@ -94,5 +102,58 @@ public class EpisodeRunner {
             }
         }
 
+    }
+
+    /**
+     * Run the baseline test for the given predictors and agents
+     * 
+     * @param baselinePredictors
+     *            The baseline predictors
+     * @param agents
+     *            The agents
+     * @return The average rewards over all agents and baselines
+     */
+    private static long runBaselineTest(final List<BaselinePredictor> baselinePredictors,
+            final List<ShimonsAgent> agents) {
+
+        // Performs tests for each agent
+        for (final ShimonsAgent agent : agents) {
+            for (BaselinePredictor predictor : baselinePredictors) {
+                for (int i = 0; i < EpisodeRunner.ENVIRONMENTS_PER_EVALUATION; ++i) {
+
+                    agent.agent_init(predictor.env_init());
+
+                    // Perform the first step in the episode
+                    final Observation initObs = predictor.env_start();
+                    Action action = agent.agent_start(initObs);
+                    Reward_observation_terminal rewObs = null;
+
+                    // Perform steps until the episode is over or the state is terminal
+                    for (int timestep = 0; timestep < EPISODE_LENGTH; timestep++) {
+                        rewObs = predictor.env_step(action);
+                        if (rewObs.isTerminal()) {
+                            break;
+                        }
+                        action = agent.agent_step(rewObs.getReward(), rewObs.getObservation());
+                    }
+                    agent.agent_end(rewObs.getReward());
+                }
+            }
+        }
+
+        double totalReward = 0;
+        for (ShimonsAgent agent : agents) {
+            totalReward += agent.getAverageReward();
+        }
+
+        // Clean up the specimens
+        for (final Predictor predictor : baselinePredictors) {
+            predictor.env_cleanup();
+        }
+        for (final ShimonsAgent agent : agents) {
+            agent.agent_cleanup();
+        }
+
+        return Math.round(totalReward / agents.size());
     }
 }

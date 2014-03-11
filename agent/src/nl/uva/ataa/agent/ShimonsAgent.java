@@ -77,7 +77,7 @@ public class ShimonsAgent extends NeuralNetworkAgent implements ChromosomeSpecim
 
     @Override
     protected double[] getInput(final double[] o) {
-        return new double[] { o[3], o[0], o[10], o[4], o[1], o[9], o[11], o[5], o[2] };
+        return new double[] { o[4], o[1], o[9], o[3], o[0], o[10], o[11], o[5], o[2] };
     }
 
     @Override

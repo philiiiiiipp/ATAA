@@ -1,19 +1,11 @@
 package nl.uva.ataa.agent;
 
-import java.util.List;
-import java.util.Locale;
-
 import org.rlcommunity.rlglue.codec.types.Action;
 import org.rlcommunity.rlglue.codec.types.Observation;
 import org.rlcommunity.rlglue.codec.types.Reward_observation_terminal;
 
-import nl.uva.ataa.environment.BetaPredictor;
-import nl.uva.ataa.environment.Predictor;
 import nl.uva.ataa.environment.Wind;
 import nl.uva.ataa.environment.WindEnvironment;
-import nl.uva.ataa.environment.fitness.RewardFitness;
-import nl.uva.ataa.evolver.PredictorEvolver;
-import nl.uva.ataa.utilities.Utilities;
 
 public class GenericAgentTester {
 
@@ -22,7 +14,6 @@ public class GenericAgentTester {
      */
     public static void main(String[] args) {
 
-        final int numPredictors = 20;
         final int episodeLength = 1000;
 
         // set up the generic agent from Shimon's research

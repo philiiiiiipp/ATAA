@@ -14,6 +14,7 @@ import nl.uva.ataa.evolver.PredictorEvolver;
 import nl.uva.ataa.utilities.Utilities;
 
 import org.rlcommunity.environment.helicopter.HelicopterState;
+import org.rlcommunity.rlglue.codec.AgentInterface;
 import org.rlcommunity.rlglue.codec.types.Action;
 import org.rlcommunity.rlglue.codec.types.Observation;
 import org.rlcommunity.rlglue.codec.types.Reward_observation_terminal;
@@ -65,22 +66,7 @@ public class EpisodeRunner {
 
                     // Pick a random predictor and initialise the parties
                     final Predictor predictor = predictors.get(Utilities.RNG.nextInt(predictors.size()));
-                    agent.agent_init(predictor.env_init());
-
-                    // Perform the first step in the episode
-                    final Observation initObs = predictor.env_start();
-                    Action action = agent.agent_start(initObs);
-                    Reward_observation_terminal rewObs = null;
-
-                    // Perform steps until the episode is over or the state is terminal
-                    for (int timestep = 0; timestep < EPISODE_LENGTH; timestep++) {
-                        rewObs = predictor.env_step(action);
-                        if (rewObs.isTerminal()) {
-                            break;
-                        }
-                        action = agent.agent_step(rewObs.getReward(), rewObs.getObservation());
-                    }
-                    agent.agent_end(rewObs.getReward());
+                    step(predictor, agent);
                 }
             }
 
@@ -120,23 +106,7 @@ public class EpisodeRunner {
         for (final ShimonsAgent agent : agents) {
             for (BaselinePredictor predictor : baselinePredictors) {
                 for (int i = 0; i < EpisodeRunner.ENVIRONMENTS_PER_EVALUATION; ++i) {
-
-                    agent.agent_init(predictor.env_init());
-
-                    // Perform the first step in the episode
-                    final Observation initObs = predictor.env_start();
-                    Action action = agent.agent_start(initObs);
-                    Reward_observation_terminal rewObs = null;
-
-                    // Perform steps until the episode is over or the state is terminal
-                    for (int timestep = 0; timestep < EPISODE_LENGTH; timestep++) {
-                        rewObs = predictor.env_step(action);
-                        if (rewObs.isTerminal()) {
-                            break;
-                        }
-                        action = agent.agent_step(rewObs.getReward(), rewObs.getObservation());
-                    }
-                    agent.agent_end(rewObs.getReward());
+                    step(predictor, agent);
                 }
             }
         }
@@ -155,5 +125,32 @@ public class EpisodeRunner {
         }
 
         return Math.round(totalReward / agents.size());
+    }
+
+    /**
+     * Perform one glue step with a given predictor and agent
+     * 
+     * @param predictor
+     *            The given predictor
+     * @param agent
+     *            The given agent
+     */
+    private static void step(final Predictor predictor, final AgentInterface agent) {
+        agent.agent_init(predictor.env_init());
+
+        // Perform the first step in the episode
+        final Observation initObs = predictor.env_start();
+        Action action = agent.agent_start(initObs);
+        Reward_observation_terminal rewObs = null;
+
+        // Perform steps until the episode is over or the state is terminal
+        for (int timestep = 0; timestep < EPISODE_LENGTH; timestep++) {
+            rewObs = predictor.env_step(action);
+            if (rewObs.isTerminal()) {
+                break;
+            }
+            action = agent.agent_step(rewObs.getReward(), rewObs.getObservation());
+        }
+        agent.agent_end(rewObs.getReward());
     }
 }

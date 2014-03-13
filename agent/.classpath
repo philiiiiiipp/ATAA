@@ -5,6 +5,6 @@
 	<classpathentry kind="lib" path="lib/RLGlueCodec.jar"/>
 	<classpathentry kind="lib" path="lib/neuroph-core-2.8.jar" sourcepath="sources/neuroph"/>
 	<classpathentry kind="lib" path="lib/RLVizLib.jar"/>
-	<classpathentry kind="lib" path="lib/commons-math3-3.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-math3-3.2.jar" sourcepath="sources/commons-math3-3.2-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

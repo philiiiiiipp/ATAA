@@ -5,13 +5,12 @@ import java.util.Locale;
 
 import nl.uva.ataa.agent.ShimonsAgent;
 import nl.uva.ataa.environment.BaselinePredictor;
-import nl.uva.ataa.environment.BetaPredictor;
+import nl.uva.ataa.environment.DiscreteWindPredictor;
 import nl.uva.ataa.environment.Predictor;
 import nl.uva.ataa.environment.fitness.FitnessFunction;
-import nl.uva.ataa.environment.fitness.KurtosisFitness;
+import nl.uva.ataa.environment.fitness.RewardFitness;
 import nl.uva.ataa.evolver.AgentEvolver;
-import nl.uva.ataa.evolver.PredictorEvolver;
-import nl.uva.ataa.utilities.Utilities;
+import nl.uva.ataa.evolver.DiscreteWindPredictorEvolver;
 
 import org.rlcommunity.environment.helicopter.HelicopterState;
 import org.rlcommunity.rlglue.codec.AgentInterface;
@@ -22,19 +21,19 @@ import org.rlcommunity.rlglue.codec.types.Reward_observation_terminal;
 public class EpisodeRunner {
 
     /** The amount of predictors to evolve */
-    private static final int NUM_PREDICTORS = 20;
+    private static final int NUM_PREDICTORS = 1;
     /** The amount of agents to evolve */
-    private static final int NUM_AGENTS = 40;
+    private static final int NUM_AGENTS = 50;
 
     /** The amount of environments tested per agent per generation */
-    private static final int ENVIRONMENTS_PER_EVALUATION = 30;
+    private static final int ENVIRONMENTS_PER_EVALUATION = 50;
     /** The amount of generations to evolve */
     private static final int NUM_GENERATIONS = 100;
     /** The maximum length of an episode */
     public static final int EPISODE_LENGTH = 1000;
 
     /** The fitness function to test the predictor with */
-    private static final FitnessFunction PREDICTOR_FITNESS = new KurtosisFitness();
+    private static final FitnessFunction PREDICTOR_FITNESS = new RewardFitness();
 
     /** The minimum possible reward after an episode */
     public static final double MIN_REWARD = (-3.0f * HelicopterState.MAX_POS * HelicopterState.MAX_POS + -3.0f
@@ -45,28 +44,28 @@ public class EpisodeRunner {
 
     public static void main(final String[] args) {
 
-        final PredictorEvolver predictorEvolver = new PredictorEvolver(NUM_PREDICTORS, PREDICTOR_FITNESS);
+        final DiscreteWindPredictorEvolver predictorEvolver = new DiscreteWindPredictorEvolver(NUM_PREDICTORS,
+                PREDICTOR_FITNESS);
         final AgentEvolver agentEvolver = new AgentEvolver(NUM_AGENTS);
 
-        final List<BetaPredictor> predictors = predictorEvolver.getSpecimens();
+        final List<DiscreteWindPredictor> predictors = predictorEvolver.getSpecimens();
         final List<ShimonsAgent> agents = agentEvolver.getSpecimens();
         final List<BaselinePredictor> baselinePredictors = BaselinePredictor.getAllBaselines();
 
-        long lastBaselineReward = 0;
+        final long lastBaselineReward = 0;
         for (int generation = 0; generation < NUM_GENERATIONS; generation++) {
 
-            long averageBaselineReward = runBaselineTest(baselinePredictors, agents);
-            System.out.println("Baseline average reward over " + baselinePredictors.size() + " environments: "
-                    + averageBaselineReward + " diff: " + (averageBaselineReward - lastBaselineReward));
-            lastBaselineReward = averageBaselineReward;
+            // final long averageBaselineReward = runBaselineTest(baselinePredictors, agents);
+            // System.out.println("Baseline average reward over " + baselinePredictors.size() + " environments: "
+            // + averageBaselineReward + " diff: " + (averageBaselineReward - lastBaselineReward));
+            // lastBaselineReward = averageBaselineReward;
 
-            // Performs tests for each agent
+            // Performs tests for each agent and each predictor
             for (final ShimonsAgent agent : agents) {
-                for (int i = 0; i < EpisodeRunner.ENVIRONMENTS_PER_EVALUATION; ++i) {
-
-                    // Pick a random predictor and initialise the parties
-                    final Predictor predictor = predictors.get(Utilities.RNG.nextInt(predictors.size()));
-                    step(predictor, agent);
+                for (final Predictor predictor : predictors) {
+                    for (int i = 0; i < EpisodeRunner.ENVIRONMENTS_PER_EVALUATION; ++i) {
+                        runEpisode(predictor, agent);
+                    }
                 }
             }
 
@@ -76,8 +75,20 @@ public class EpisodeRunner {
                     + Math.round(predictorEvolver.getAverageFitness()));
 
             // Evolve the specimens
-            predictorEvolver.evolve();
+            // predictorEvolver.evolve();
             agentEvolver.evolve();
+
+            System.out.print("                                        ");
+            final double[] distributionWeights = new double[10];
+            for (final DiscreteWindPredictor predictor : predictors) {
+                for (int i = 0; i < 10; ++i) {
+                    distributionWeights[i] += predictor.mDistributionWeights[i];
+                }
+            }
+            for (int i = 0; i < 10; ++i) {
+                System.out.print(Math.round(distributionWeights[i] * 10) / (10.0 * NUM_PREDICTORS) + "  ");
+            }
+            System.out.println();
 
             // Clean up the specimens
             for (final Predictor predictor : predictors) {
@@ -104,15 +115,15 @@ public class EpisodeRunner {
 
         // Performs tests for each agent
         for (final ShimonsAgent agent : agents) {
-            for (BaselinePredictor predictor : baselinePredictors) {
+            for (final BaselinePredictor predictor : baselinePredictors) {
                 for (int i = 0; i < EpisodeRunner.ENVIRONMENTS_PER_EVALUATION; ++i) {
-                    step(predictor, agent);
+                    runEpisode(predictor, agent);
                 }
             }
         }
 
         double totalReward = 0;
-        for (ShimonsAgent agent : agents) {
+        for (final ShimonsAgent agent : agents) {
             totalReward += agent.getAverageReward();
         }
 
@@ -135,7 +146,7 @@ public class EpisodeRunner {
      * @param agent
      *            The given agent
      */
-    private static void step(final Predictor predictor, final AgentInterface agent) {
+    private static void runEpisode(final Predictor predictor, final AgentInterface agent) {
         agent.agent_init(predictor.env_init());
 
         // Perform the first step in the episode

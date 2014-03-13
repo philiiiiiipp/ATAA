@@ -25,9 +25,11 @@ public abstract class Predictor implements EnvironmentInterface {
     /** The amount of episodes ran */
     private int mNumEpisodes = 0;
 
+    private double[] mStartState = null;
+
     /**
-     * Generates a random environment, based on the implementation's distribution. The new
-     * environment will be used in the next episode.
+     * Generates a random environment, based on the implementation's distribution. The new environment will be used in
+     * the next episode.
      * 
      * @return A random environment
      */
@@ -41,8 +43,7 @@ public abstract class Predictor implements EnvironmentInterface {
      * Must return a sample in [0, 1] to be used as a wind parameter.
      * 
      * @param index
-     *            The index of the sample, ranging from 0 to 7, corresponding to the the two winds'
-     *            parameters
+     *            The index of the sample, ranging from 0 to 7, corresponding to the the two winds' parameters
      * @return A sample in [0, 1]
      */
     protected abstract double getSample(final int index);
@@ -56,11 +57,19 @@ public abstract class Predictor implements EnvironmentInterface {
         return mCurrentEnvironment.env_init();
     }
 
+    public void setStartState(final double[] startState) {
+        mStartState = startState;
+    }
+
     @Override
     public Observation env_start() {
         ++mNumEpisodes;
 
-        return mCurrentEnvironment.env_start();
+        if (mStartState == null) {
+            return mCurrentEnvironment.env_start();
+        } else {
+            return mCurrentEnvironment.env_start(mStartState);
+        }
     }
 
     @Override

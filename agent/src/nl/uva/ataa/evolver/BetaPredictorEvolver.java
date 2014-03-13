@@ -4,7 +4,7 @@ import nl.uva.ataa.environment.BetaPredictor;
 import nl.uva.ataa.environment.fitness.FitnessFunction;
 import nl.uva.ataa.utilities.Conf;
 
-public class PredictorEvolver extends Evolver<BetaPredictor> {
+public class BetaPredictorEvolver extends Evolver<BetaPredictor> {
 
     /** The chance that two chromosomes will mate */
     private static final double CROSSOVER_RATE = 0.8;
@@ -29,7 +29,7 @@ public class PredictorEvolver extends Evolver<BetaPredictor> {
      * @param fitnessFunction
      *            The fitness function to test the predictor with
      */
-    public PredictorEvolver(final int poolSize, final FitnessFunction fitnessFunction) {
+    public BetaPredictorEvolver(final int poolSize, final FitnessFunction fitnessFunction) {
         super(poolSize, CROSSOVER_RATE, CROSSOVER_RATIO, MUTATION_RATE, MUTATION_RANGE, TOURNAMENT_SIZE, ELITISM_RATE,
                 new Conf("ff", fitnessFunction));
     }

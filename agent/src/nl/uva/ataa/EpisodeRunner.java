@@ -21,12 +21,12 @@ import org.rlcommunity.rlglue.codec.types.Reward_observation_terminal;
 public class EpisodeRunner {
 
     /** The amount of predictors to evolve */
-    private static final int NUM_PREDICTORS = 30;
+    private static final int NUM_PREDICTORS = 20;
     /** The amount of agents to evolve */
-    private static final int NUM_AGENTS = 40;
+    private static final int NUM_AGENTS = 20;
 
     /** The amount of environments tested per agent per generation */
-    private static final int ENVIRONMENTS_PER_EVALUATION = 15;
+    private static final int ENVIRONMENTS_PER_EVALUATION = 10;
     /** The amount of generations to evolve */
     private static final int NUM_GENERATIONS = 100;
     /** The maximum length of an episode */
@@ -44,7 +44,7 @@ public class EpisodeRunner {
 
     public static void main(final String[] args) {
 
-        final StatePredictorEvolver predictorEvolver = new StatePredictorEvolver(NUM_PREDICTORS, PREDICTOR_FITNESS, 5);
+        final StatePredictorEvolver predictorEvolver = new StatePredictorEvolver(NUM_PREDICTORS, PREDICTOR_FITNESS, 4);
         final AgentEvolver agentEvolver = new AgentEvolver(NUM_AGENTS);
 
         final List<StatePredictor> predictors = predictorEvolver.getSpecimens();

@@ -71,13 +71,13 @@ public class StateBaselinePredictor extends Predictor {
         baselines.add(new StateBaselinePredictor(Baseline.ONE));
         baselines.add(new StateBaselinePredictor(Baseline.TWO));
         baselines.add(new StateBaselinePredictor(Baseline.THREE));
-        // baselines.add(new StateBaselinePredictor(Baseline.FOUR));
-        // baselines.add(new StateBaselinePredictor(Baseline.FIVE));
-        // baselines.add(new StateBaselinePredictor(Baseline.SIX));
+        baselines.add(new StateBaselinePredictor(Baseline.FOUR));
+        baselines.add(new StateBaselinePredictor(Baseline.FIVE));
+        baselines.add(new StateBaselinePredictor(Baseline.SIX));
         baselines.add(new StateBaselinePredictor(Baseline.SEVEN));
-        // baselines.add(new StateBaselinePredictor(Baseline.EIGHT));
+        baselines.add(new StateBaselinePredictor(Baseline.EIGHT));
         baselines.add(new StateBaselinePredictor(Baseline.NINE));
-        // baselines.add(new StateBaselinePredictor(Baseline.TEN));
+        baselines.add(new StateBaselinePredictor(Baseline.TEN));
 
         return baselines;
     }

@@ -64,6 +64,22 @@ public class EpisodeRunner {
                 runEpisode(baselinePredictor, bestAgent);
             }
 
+            // Test the generic/baseline agent from Shimon to see how good the true value is predicted
+            ShimonsAgent baselineAgent = new ShimonsAgent();
+            baselineAgent.setWeights(new double[] { -0.7118, 0.3188, -1.2159, 2.3283, 0.1129, -1.1902, -0.5062, 0.5478,
+                    -0.7646, -0.2285, -2.5869, -0.225, 0.8412, -1.6608, -0.2988, 2.937, 0.0, 1.3106, -0.2752, 0.2084,
+                    -2.3259, -0.3596, 0.3116, 0.773, 0.7982, -0.5549, -0.0631, 2.0086, -0.6239, -1.346, 0.2472, 1.4733,
+                    1.3579, 0.3694, 0.0288, 1.808, 0.4698, -1.0696, -0.178, 0.0742, -0.0004, -1.105 });
+            for (final Predictor predictor : predictors) {
+                for (int i = 0; i < EpisodeRunner.ENVIRONMENTS_PER_EVALUATION; ++i) {
+                    runEpisode(predictor, baselineAgent);
+                }
+            }
+            double avgRewardBaselineTrue = -24370.5291489543;
+            double avgRewardBaselinePred = baselineAgent.getAverageReward();
+            double avgRewardBaselineErr = Math.abs(avgRewardBaselineTrue - avgRewardBaselinePred);
+            // System.out.println("Error in predicting agent fitness: " + avgRewardBaselineErr);
+            
             // Print scores
             final long agentFitness = agentEvolver.getAverageFitness();
             final String steps = formatSteps(agentEvolver.getAverageNumSteps());
@@ -96,7 +112,6 @@ public class EpisodeRunner {
             }
             baselinePredictor.env_cleanup();
         }
-
     }
 
     /**

@@ -1,8 +1,11 @@
 package nl.uva.ataa;
 
 import nl.uva.ataa.agent.ShimonsAgent;
+import nl.uva.ataa.environment.BaselineStatePredictor;
 import nl.uva.ataa.environment.Predictor;
 import nl.uva.ataa.environment.UniformPredictor;
+import nl.uva.ataa.environment.fitness.FitnessFunction;
+import nl.uva.ataa.environment.fitness.VarianceFitness;
 
 import org.rlcommunity.rlglue.codec.AgentInterface;
 import org.rlcommunity.rlglue.codec.types.Action;
@@ -16,8 +19,17 @@ public class AgentValueEstimator {
     /** The maximum length of an episode */
     public static final int EPISODE_LENGTH = 15;
 
+    public static final int NUM_PARAM_VALUES = 4;
+    public static final int BASELINE_SIZE = 300000;
+
+    private static final FitnessFunction PREDICTOR_FITNESS = new VarianceFitness();
+    
     public static void main(final String[] args) {
 
+        // baseline pred
+        final BaselineStatePredictor baselinePredictor = new BaselineStatePredictor(NUM_PARAM_VALUES, BASELINE_SIZE,
+                PREDICTOR_FITNESS);
+        
         // the generic agent from Shimon's paper
         ShimonsAgent baselineAgent = new ShimonsAgent();
         baselineAgent.setWeights(new double[] { -0.7118, 0.3188, -1.2159, 2.3283, 0.1129, -1.1902, -0.5062, 0.5478,
@@ -35,14 +47,16 @@ public class AgentValueEstimator {
         long startTime = System.currentTimeMillis();
         int step = 10;
         for (int runs = 10; runs <= 100000; runs = runs + step) {
-            double cumulReturn = 0;
             for (int i = 0; i < runs; ++i) {
-                cumulReturn += runEpisode(uniformPredictor, baselineAgent);
+                runEpisode(baselinePredictor, baselineAgent);
             }
-            double averageReturn = cumulReturn / runs;
+            double averageReturn = baselineAgent.getAverageReward();
+            double averageSteps = baselineAgent.getAverageNumSteps();
+            // cleanup agent so avg return is reset
+            baselineAgent.agent_cleanup();
             
             int timeTaken = Math.round((System.currentTimeMillis() - startTime) / 1000);
-            System.out.println("" + runs + " , " + averageReturn + " , " + timeTaken + " ; " );
+            System.out.println("" + runs + " , " + averageReturn + " , " + averageSteps + " , " + timeTaken + " ; " );
                         
             if (runs == 100) step = 50;
             if (runs == 1000) step = 100;
@@ -55,14 +69,14 @@ public class AgentValueEstimator {
     }
 
     /**
-     * Perform one glue step with a given predictor and agent
+     * Perform one glue step with a given predictor and agent.
      * 
      * @param predictor
      *            The given predictor
      * @param agent
      *            The given agent
      */
-    private static double runEpisode(final Predictor predictor, final AgentInterface agent) {
+    private static void runEpisode(final Predictor predictor, final AgentInterface agent) {
         agent.agent_init(predictor.env_init());
 
         // Perform the first step in the episode
@@ -70,20 +84,14 @@ public class AgentValueEstimator {
         Action action = agent.agent_start(initObs);
         Reward_observation_terminal rewObs = null;
 
-        // return the cumulative reward (return) for that episode
-        double reward = 0;
-        
         // Perform steps until the episode is over or the state is terminal
         for (int timestep = 0; timestep < EPISODE_LENGTH; timestep++) {
             rewObs = predictor.env_step(action);
-            reward += rewObs.getReward();
             if (rewObs.isTerminal()) {
                 break;
             }
             action = agent.agent_step(rewObs.getReward(), rewObs.getObservation());
         }
         agent.agent_end(rewObs.getReward());
-        
-        return reward;
     }
 }

@@ -3,7 +3,6 @@ package nl.uva.ataa;
 import nl.uva.ataa.agent.ShimonsAgent;
 import nl.uva.ataa.environment.BaselineStatePredictor;
 import nl.uva.ataa.environment.Predictor;
-import nl.uva.ataa.environment.UniformPredictor;
 import nl.uva.ataa.environment.fitness.FitnessFunction;
 import nl.uva.ataa.environment.fitness.VarianceFitness;
 
@@ -23,41 +22,39 @@ public class AgentValueEstimator {
     public static final int BASELINE_SIZE = 300000;
 
     private static final FitnessFunction PREDICTOR_FITNESS = new VarianceFitness();
-    
+
     public static void main(final String[] args) {
 
-        // baseline pred
         final BaselineStatePredictor baselinePredictor = new BaselineStatePredictor(NUM_PARAM_VALUES, BASELINE_SIZE,
                 PREDICTOR_FITNESS);
-        
+
         // the generic agent from Shimon's paper
-        ShimonsAgent baselineAgent = new ShimonsAgent();
+        final ShimonsAgent baselineAgent = new ShimonsAgent();
         baselineAgent.setWeights(new double[] { -0.7118, 0.3188, -1.2159, 2.3283, 0.1129, -1.1902, -0.5062, 0.5478,
                 -0.7646, -0.2285, -2.5869, -0.225, 0.8412, -1.6608, -0.2988, 2.937, 0.0, 1.3106, -0.2752, 0.2084,
                 -2.3259, -0.3596, 0.3116, 0.773, 0.7982, -0.5549, -0.0631, 2.0086, -0.6239, -1.346, 0.2472, 1.4733,
                 1.3579, 0.3694, 0.0288, 1.808, 0.4698, -1.0696, -0.178, 0.0742, -0.0004, -1.105 });
 
-        // get a uniform predictor
-        UniformPredictor uniformPredictor = new UniformPredictor();
-
-        // we have 4^9 = 262,144
+        // we have 4^9 = 262,144 possible environments
         // and we want to find out the true value of the agent
         // which is the return over 15 episodes
-        System.out.println("runs , avg return , time");
-        long startTime = System.currentTimeMillis();
+        System.out.println("runs, avg return, avg steps, time");
         int step = 10;
-        for (int runs = 10; runs <= 100000; runs = runs + step) {
+        final long startTime = System.currentTimeMillis();
+        for (int runs = 10; runs <= 100000; runs += step) {
             for (int i = 0; i < runs; ++i) {
                 runEpisode(baselinePredictor, baselineAgent);
             }
-            double averageReturn = baselineAgent.getAverageReward();
-            double averageSteps = baselineAgent.getAverageNumSteps();
+
+            final double timeTaken = Math.round((System.currentTimeMillis() - startTime) / 10.0) / 100.0;
+
+            final double averageReturn = baselineAgent.getAverageReward();
+            final double averageSteps = baselineAgent.getAverageNumSteps();
             // cleanup agent so avg return is reset
             baselineAgent.agent_cleanup();
-            
-            int timeTaken = Math.round((System.currentTimeMillis() - startTime) / 1000);
-            System.out.println("" + runs + " , " + averageReturn + " , " + averageSteps + " , " + timeTaken + " ; " );
-                        
+
+            System.out.println(runs + ", " + averageReturn + ", " + averageSteps + ", " + timeTaken + ";");
+
             if (runs == 100) step = 50;
             if (runs == 1000) step = 100;
             if (runs == 5000) step = 500;
@@ -65,7 +62,6 @@ public class AgentValueEstimator {
             if (runs == 20000) step = 5000;
             if (runs == 50000) step = 10000;
         }
-        System.out.println("avg num steps: " + baselineAgent.getAverageNumSteps());
     }
 
     /**

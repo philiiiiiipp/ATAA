@@ -17,6 +17,12 @@ public class StatePredictor extends DiscretePredictor implements ChromosomeSpeci
 
     public static final double BORDER_RANGE = 0.1;
 
+    public static double sampleToParam(final int index, final double sample, final int numParamValues) {
+        final double modifier = MODIFIERS[index / 3];
+        final double discreteSample = Math.floor(sample * numParamValues) / (numParamValues - 1);
+        return discreteSample * (2 - BORDER_RANGE * 2) * modifier - modifier + BORDER_RANGE * modifier;
+    }
+
     /**
      * Creates a new predictor with random beta distributions.
      */
@@ -34,9 +40,8 @@ public class StatePredictor extends DiscretePredictor implements ChromosomeSpeci
         double envProbability = 1;
         final double[] startState = new double[12];
         for (int i = 0; i < 9; ++i) {
-            final double modifier = MODIFIERS[i / 3];
             final double sample = super.getSample(i);
-            startState[i] = sample * (2 - BORDER_RANGE * 2) * modifier - modifier + BORDER_RANGE;
+            startState[i] = sampleToParam(i, sample, mNumParamValues);
 
             envProbability *= getDiscreteProbability(i, sample);
         }

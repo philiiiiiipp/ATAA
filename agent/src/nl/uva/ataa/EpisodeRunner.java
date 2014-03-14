@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Locale;
 
 import nl.uva.ataa.agent.ShimonsAgent;
+import nl.uva.ataa.environment.BaselinePredictor;
 import nl.uva.ataa.environment.Predictor;
 import nl.uva.ataa.environment.StatePredictor;
 import nl.uva.ataa.environment.fitness.FitnessFunction;
@@ -22,7 +23,7 @@ public class EpisodeRunner {
     /** The amount of predictors to evolve */
     private static final int NUM_PREDICTORS = 20;
     /** The amount of agents to evolve */
-    private static final int NUM_AGENTS = 20;
+    private static final int NUM_AGENTS = 40;
 
     /** The amount of environments tested per agent per generation */
     private static final int ENVIRONMENTS_PER_EVALUATION = 10;
@@ -31,7 +32,8 @@ public class EpisodeRunner {
     /** The maximum length of an episode */
     public static final int EPISODE_LENGTH = 15;
 
-    public static final int NUM_DISCRETE_VALUES = 4;
+    public static final int NUM_PARAM_VALUES = 4;
+    public static final int BASELINE_SIZE = 10000;
 
     /** The fitness function to test the predictor with */
     private static final FitnessFunction PREDICTOR_FITNESS = new VarianceFitness();
@@ -45,11 +47,12 @@ public class EpisodeRunner {
 
     public static void main(final String[] args) {
 
-        final StatePredictor baselinePredictor = new StatePredictor(NUM_DISCRETE_VALUES, PREDICTOR_FITNESS);
+        final BaselinePredictor baselinePredictor = new BaselinePredictor(NUM_PARAM_VALUES, BASELINE_SIZE,
+                PREDICTOR_FITNESS);
 
         final AgentEvolver agentEvolver = new AgentEvolver(NUM_AGENTS);
         final StatePredictorEvolver predictorEvolver = new StatePredictorEvolver(NUM_PREDICTORS, PREDICTOR_FITNESS,
-                NUM_DISCRETE_VALUES);
+                NUM_PARAM_VALUES);
 
         final List<ShimonsAgent> agents = agentEvolver.getSpecimens();
         final List<StatePredictor> predictors = predictorEvolver.getSpecimens();
@@ -71,8 +74,7 @@ public class EpisodeRunner {
 
             // Test the best agent against the baseline
             final ShimonsAgent bestAgent = agentEvolver.cloneBestAgent();
-            for (int i = 0; i < 100; ++i) {
-                // TODO: Change stop condition to predictor length
+            for (int i = 0; i < baselinePredictor.getTotalNumberOfBaselines(); ++i) {
                 runEpisode(baselinePredictor, bestAgent);
             }
             System.out.println("          " + Math.round(bestAgent.getAverageReward()) + " - "

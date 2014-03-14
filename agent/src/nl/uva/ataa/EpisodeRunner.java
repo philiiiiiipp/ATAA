@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Locale;
 
 import nl.uva.ataa.agent.ShimonsAgent;
-import nl.uva.ataa.environment.BaselinePredictor;
+import nl.uva.ataa.environment.BaselineStatePredictor;
 import nl.uva.ataa.environment.Predictor;
 import nl.uva.ataa.environment.StatePredictor;
 import nl.uva.ataa.environment.fitness.FitnessFunction;
@@ -12,7 +12,6 @@ import nl.uva.ataa.environment.fitness.VarianceFitness;
 import nl.uva.ataa.evolver.AgentEvolver;
 import nl.uva.ataa.evolver.StatePredictorEvolver;
 
-import org.rlcommunity.environment.helicopter.HelicopterState;
 import org.rlcommunity.rlglue.codec.AgentInterface;
 import org.rlcommunity.rlglue.codec.types.Action;
 import org.rlcommunity.rlglue.codec.types.Observation;
@@ -20,41 +19,32 @@ import org.rlcommunity.rlglue.codec.types.Reward_observation_terminal;
 
 public class EpisodeRunner {
 
-    /** The amount of predictors to evolve */
-    private static final int NUM_PREDICTORS = 20;
-    /** The amount of agents to evolve */
-    private static final int NUM_AGENTS = 40;
+    public static final int NUM_PREDICTORS = 30;
+    public static final int NUM_AGENTS = 30;
 
-    /** The amount of environments tested per agent per generation */
-    private static final int ENVIRONMENTS_PER_EVALUATION = 10;
-    /** The amount of generations to evolve */
-    private static final int NUM_GENERATIONS = 100;
-    /** The maximum length of an episode */
+    public static final int ENVIRONMENTS_PER_EVALUATION = 10;
+    public static final int NUM_GENERATIONS = 100;
     public static final int EPISODE_LENGTH = 15;
 
     public static final int NUM_PARAM_VALUES = 4;
-    public static final int BASELINE_SIZE = 10000;
+    public static final int BASELINE_SIZE = 50000;
 
-    /** The fitness function to test the predictor with */
+    public static final boolean PREDICTOR_EVOLUTION = true;
+    public static final boolean CORRECT_BIAS = true;
+
     private static final FitnessFunction PREDICTOR_FITNESS = new VarianceFitness();
-
-    /** The minimum possible reward after an episode */
-    public static final double MIN_REWARD = (-3.0f * HelicopterState.MAX_POS * HelicopterState.MAX_POS + -3.0f
-            * HelicopterState.MAX_RATE * HelicopterState.MAX_RATE + -3.0f * HelicopterState.MAX_VEL
-            * HelicopterState.MAX_VEL - (1.0f - HelicopterState.MIN_QW_BEFORE_HITTING_TERMINAL_STATE
-            * HelicopterState.MIN_QW_BEFORE_HITTING_TERMINAL_STATE))
-            * EpisodeRunner.EPISODE_LENGTH;
 
     public static void main(final String[] args) {
 
-        final BaselinePredictor baselinePredictor = new BaselinePredictor(NUM_PARAM_VALUES, BASELINE_SIZE,
+        final BaselineStatePredictor baselinePredictor = new BaselineStatePredictor(NUM_PARAM_VALUES, BASELINE_SIZE,
                 PREDICTOR_FITNESS);
 
         final AgentEvolver agentEvolver = new AgentEvolver(NUM_AGENTS);
+        agentEvolver.setBiasCorrection(CORRECT_BIAS);
+        final List<ShimonsAgent> agents = agentEvolver.getSpecimens();
+
         final StatePredictorEvolver predictorEvolver = new StatePredictorEvolver(NUM_PREDICTORS, PREDICTOR_FITNESS,
                 NUM_PARAM_VALUES);
-
-        final List<ShimonsAgent> agents = agentEvolver.getSpecimens();
         final List<StatePredictor> predictors = predictorEvolver.getSpecimens();
 
         for (int generation = 0; generation < NUM_GENERATIONS; ++generation) {
@@ -83,7 +73,11 @@ public class EpisodeRunner {
 
             // Evolve the specimens
             agentEvolver.evolve();
-            predictorEvolver.evolve();
+            if (PREDICTOR_EVOLUTION) {
+                predictorEvolver.evolve();
+            } else {
+                predictorEvolver.refill();
+            }
 
             // Clean up the specimens
             for (final ShimonsAgent agent : agents) {

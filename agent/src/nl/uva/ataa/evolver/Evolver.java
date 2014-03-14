@@ -24,6 +24,9 @@ public abstract class Evolver<T extends ChromosomeSpecimen> {
     /** How many best chromosomes will be directly transferred to the next generation [in %] */
     private final double mElitismRate;
 
+    private final int mPoolSize;
+    private final Conf mConf;
+
     /**
      * Prepares the new evolver with the given parameters.
      * 
@@ -47,9 +50,10 @@ public abstract class Evolver<T extends ChromosomeSpecimen> {
     protected Evolver(final int poolSize, final double crossoverRate, final double crossoverRatio,
             final double mutationRate, final double mutationRange, final int tournamentSize, final double elitismRate,
             final Conf conf) {
-        for (int i = 0; i < poolSize; i++) {
-            mSpecimens.add(getSpecimen(conf));
-        }
+        mPoolSize = poolSize;
+        mConf = conf;
+
+        refill();
 
         mGeneticAlgorithm = new GeneticAlgorithm(new UniformCrossover<Object>(crossoverRatio), crossoverRate,
                 mSpecimens.get(0).getMutationPolicy(mutationRange), mutationRate, new TournamentSelection(
@@ -106,5 +110,12 @@ public abstract class Evolver<T extends ChromosomeSpecimen> {
             fitness += specimen.getFitness();
         }
         return fitness / mSpecimens.size();
+    }
+
+    public void refill() {
+        mSpecimens.clear();
+        for (int i = 0; i < mPoolSize; i++) {
+            mSpecimens.add(getSpecimen(mConf));
+        }
     }
 }

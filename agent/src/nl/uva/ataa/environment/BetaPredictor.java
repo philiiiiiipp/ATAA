@@ -16,7 +16,9 @@ import org.apache.commons.math3.genetics.MutationPolicy;
 public class BetaPredictor extends Predictor implements ChromosomeSpecimen {
 
     /** The weights representing 8 distributions */
-    protected Double[] mDistributionWeights = new Double[16];
+    private Double[] mWeights;
+
+    private BetaDistribution[] mDistributions;
 
     private final FitnessFunction mFitnessFunction;
 
@@ -26,9 +28,12 @@ public class BetaPredictor extends Predictor implements ChromosomeSpecimen {
     public BetaPredictor(final FitnessFunction fitnessFunction) {
         mFitnessFunction = fitnessFunction;
 
-        for (int i = 0; i < mDistributionWeights.length; ++i) {
-            mDistributionWeights[i] = Utilities.RNG.nextDouble();
+        final Double[] weights = new Double[16];
+        for (int i = 0; i < weights.length; ++i) {
+            weights[i] = Utilities.RNG.nextDouble();
         }
+
+        setWeights(weights);
     }
 
     @Override
@@ -38,27 +43,31 @@ public class BetaPredictor extends Predictor implements ChromosomeSpecimen {
 
     @Override
     protected double getSample(final int index) {
-        return getDistribution(index).cumulativeProbability(Utilities.RNG.nextDouble());
+        return mDistributions[index].cumulativeProbability(Utilities.RNG.nextDouble());
     }
 
     protected double getOccuranceProbability(final int index, final double min, final double max) {
-        return getDistribution(index).probability(min, max);
+        return mDistributions[index].probability(min, max);
     }
 
-    private BetaDistribution getDistribution(final int index) {
-        final int weightIndex = index * 2;
-        return new BetaDistribution(mDistributionWeights[weightIndex], mDistributionWeights[weightIndex + 1]);
+    public void setWeights(final Double[] weights) {
+        mWeights = weights;
+        mDistributions = new BetaDistribution[mWeights.length];
+
+        for (int i = 0; i < weights.length / 2; ++i) {
+            mDistributions[i] = new BetaDistribution(mWeights[i], mWeights[i + 1]);
+        }
     }
 
     @Override
     public Chromosome getChromosome() {
         final double fitness = (getNumEpisodes() > 0 ? getFitness() : ChromosomeSpecimen.NO_FITNESS);
-        return new DoubleLimitChromosome(mDistributionWeights, fitness, 0, 1, false, true);
+        return new DoubleLimitChromosome(mWeights, fitness, 0, 1, false, true);
     }
 
     @Override
     public void setChromosome(final Chromosome chromosome) {
-        mDistributionWeights = ((DoubleLimitChromosome) chromosome).getWeights();
+        setWeights(((DoubleLimitChromosome) chromosome).getWeights());
     }
 
     @Override

@@ -69,4 +69,10 @@ public class AgentEvolver extends Evolver<ShimonsAgent> {
         return bestAgent;
     }
 
+    public void setBiasCorrection(final boolean correctBias) {
+        for (final ShimonsAgent agent : getSpecimens()) {
+            agent.setBiasCorrection(correctBias);
+        }
+    }
+
 }

@@ -6,10 +6,6 @@ import nl.uva.ataa.utilities.Utilities;
 
 import org.rlcommunity.environment.helicopter.HelicopterState;
 
-/**
- * A predictor that uses beta destributions to generate the winds within environments. It can be
- * evolved.
- */
 public class StatePredictor extends DiscretePredictor implements ChromosomeSpecimen {
 
     public static final double[] MODIFIERS = new double[] { HelicopterState.MAX_VEL, HelicopterState.MAX_POS,
@@ -17,22 +13,32 @@ public class StatePredictor extends DiscretePredictor implements ChromosomeSpeci
 
     public static final double BORDER_RANGE = 0.1;
 
+    /**
+     * Converts a sample into a value fit to put into a state parameter.
+     * 
+     * @param index
+     *            The index of the parameter
+     * @param sample
+     *            The sample in range (0,1]
+     * @param numParamValues
+     *            The amount of discrete values
+     * 
+     * @return A parameter value for the given index
+     */
     public static double sampleToParam(final int index, final double sample, final int numParamValues) {
         final double modifier = MODIFIERS[index / 3];
         final double discreteSample = Math.floor(sample * numParamValues) / (numParamValues - 1);
         return discreteSample * (2 - BORDER_RANGE * 2) * modifier - modifier + BORDER_RANGE * modifier;
     }
 
-    /**
-     * Creates a new predictor with random beta distributions.
-     */
     public StatePredictor(final int numParamValues, final FitnessFunction fitnessFunction) {
         super(numParamValues, fitnessFunction);
 
-        mDistributionWeights = new Double[18];
-        for (int i = 0; i < mDistributionWeights.length; ++i) {
-            mDistributionWeights[i] = Utilities.RNG.nextDouble();
+        final Double[] weights = new Double[18];
+        for (int i = 0; i < weights.length; ++i) {
+            weights[i] = Utilities.RNG.nextDouble();
         }
+        setWeights(weights);
     }
 
     @Override

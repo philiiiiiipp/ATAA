@@ -13,7 +13,7 @@ import java.util.List;
 import nl.uva.ataa.environment.fitness.FitnessFunction;
 import nl.uva.ataa.utilities.Utilities;
 
-public class BaselinePredictor extends DiscretePredictor {
+public class BaselineStatePredictor extends DiscretePredictor {
 
     /** The file to save the states to */
     private final static String STATE_FILE = "helicopter_start_states.dat";
@@ -35,7 +35,7 @@ public class BaselinePredictor extends DiscretePredictor {
      * @param fitnessFunction
      *            The fitness function used to evolve the predictor
      */
-    public BaselinePredictor(final int numParamValues, final int baselineAmount, final FitnessFunction fitnessFunction) {
+    public BaselineStatePredictor(final int numParamValues, final int baselineAmount, final FitnessFunction fitnessFunction) {
         super(numParamValues, fitnessFunction);
         mBaselineAmount = baselineAmount;
         mStartStates = getStartStates(mBaselineAmount, numParamValues);

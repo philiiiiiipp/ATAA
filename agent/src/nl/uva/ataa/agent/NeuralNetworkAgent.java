@@ -15,17 +15,14 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     /** The neural network used to map observations to actions */
     private final NeuralNetwork<?> mNeuralNetwork = new NeuralNetwork<>();
 
-    /** The amount of episodes ran */
     private int mNumEpisodes = 0;
-    /** The amount of steps taken */
     private int mNumSteps = 0;
-    /** The rewards that the agent has gathered */
     private double mAccumulatedReward = 0;
-
     private double mEpisodeReward = 0;
-
     private double mEpisodeBias = 1;
     private double mTotalBias = 0;
+
+    private boolean mCorrectBias = true;
 
     public NeuralNetworkAgent() {
         buildNeuralNetwork();
@@ -52,8 +49,7 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     }
 
     /**
-     * Adds a layer to the neural network and adds a bias neuron which connects to every neuron in
-     * the new layer.
+     * Adds a layer to the neural network and adds a bias neuron which connects to every neuron in the new layer.
      * 
      * @param numNeurons
      *            The amount of neurons in the new layer
@@ -236,7 +232,7 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     @Override
     public void agent_init(final String taskSpec) {
         final int biasIndex = taskSpec.indexOf("BIAS: ");
-        if (biasIndex != -1) {
+        if (mCorrectBias && biasIndex != -1) {
             int endIndex = taskSpec.indexOf(" ", biasIndex + 6);
             if (endIndex == -1) {
                 endIndex = taskSpec.length();
@@ -283,6 +279,10 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
         mNumSteps = 0;
         mTotalBias = 0;
         mEpisodeBias = 1;
+    }
+
+    public void setBiasCorrection(final boolean correctBias) {
+        mCorrectBias = correctBias;
     }
 
 }

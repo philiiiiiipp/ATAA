@@ -53,7 +53,7 @@ public class HelicopterState {
 
     public static final double MAX_RATE = 2 * 3.1415 * 2;
 
-    static final double MAX_QUAT = 1.0;
+    public static final double MAX_QUAT = 1.0;
 
     public static final double MIN_QW_BEFORE_HITTING_TERMINAL_STATE = Math.cos(30.0 / 2.0 * Math.PI / 180.0);
 
@@ -124,6 +124,15 @@ public class HelicopterState {
         position = new HeliVector(0.0d, 0.0d, 0.0d);
         angular_rate = new HeliVector(0.0d, 0.0d, 0.0d);
         q = new Quaternion(0.0d, 0.0d, 0.0d, 1.0);
+        num_sim_steps = 0;
+        env_terminal = false;
+    }
+
+    public void reset(final double[] params) {
+        velocity = new HeliVector(params[0], params[1], params[2]);
+        position = new HeliVector(params[3], params[4], params[5]);
+        angular_rate = new HeliVector(params[6], params[7], params[8]);
+        q = new Quaternion(params[9], params[10], params[11], 1.0);
         num_sim_steps = 0;
         env_terminal = false;
     }

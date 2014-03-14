@@ -16,7 +16,7 @@ import org.apache.commons.math3.genetics.MutationPolicy;
 public class BetaPredictor extends Predictor implements ChromosomeSpecimen {
 
     /** The weights representing 8 distributions */
-    public Double[] mDistributionWeights = new Double[16];
+    protected Double[] mDistributionWeights = new Double[16];
 
     private final FitnessFunction mFitnessFunction;
 
@@ -38,13 +38,16 @@ public class BetaPredictor extends Predictor implements ChromosomeSpecimen {
 
     @Override
     protected double getSample(final int index) {
-        final int weightIndex = index * 2;
-        return getSample(mDistributionWeights[weightIndex], mDistributionWeights[weightIndex + 1]);
+        return getDistribution(index).cumulativeProbability(Utilities.RNG.nextDouble());
     }
 
-    private double getSample(final double alpha, final double beta) {
-        final BetaDistribution betaDist = new BetaDistribution(alpha, beta);
-        return betaDist.cumulativeProbability(Utilities.RNG.nextDouble());
+    protected double getOccuranceProbability(final int index, final double min, final double max) {
+        return getDistribution(index).probability(min, max);
+    }
+
+    private BetaDistribution getDistribution(final int index) {
+        final int weightIndex = index * 2;
+        return new BetaDistribution(mDistributionWeights[weightIndex], mDistributionWeights[weightIndex + 1]);
     }
 
     @Override

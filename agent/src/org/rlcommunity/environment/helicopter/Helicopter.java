@@ -277,8 +277,23 @@ public abstract class Helicopter extends EnvironmentBase implements HasAVisualiz
         if (recordLogs) {
             theEpisodeLogger.clear();
         }
+
         // start at origin, zero velocity, zero angular rate, perfectly level and facing north
         heli.reset();
+
+        if (recordLogs) {
+            final String stateSerialized = heli.stringSerialize();
+            theEpisodeLogger.appendLogString(stateSerialized);
+        }
+        return makeObservation();
+    }
+
+    public Observation env_start(final double[] startState) {
+        if (recordLogs) {
+            theEpisodeLogger.clear();
+        }
+
+        heli.reset(startState);
 
         if (recordLogs) {
             final String stateSerialized = heli.stringSerialize();

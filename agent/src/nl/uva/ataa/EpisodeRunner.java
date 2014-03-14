@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Locale;
 
 import nl.uva.ataa.agent.ShimonsAgent;
-import nl.uva.ataa.environment.BaselinePredictor;
-import nl.uva.ataa.environment.DiscreteWindPredictor;
 import nl.uva.ataa.environment.Predictor;
+import nl.uva.ataa.environment.StateBaselinePredictor;
+import nl.uva.ataa.environment.StatePredictor;
 import nl.uva.ataa.environment.fitness.FitnessFunction;
-import nl.uva.ataa.environment.fitness.RewardFitness;
+import nl.uva.ataa.environment.fitness.VarianceFitness;
 import nl.uva.ataa.evolver.AgentEvolver;
-import nl.uva.ataa.evolver.DiscreteWindPredictorEvolver;
+import nl.uva.ataa.evolver.StatePredictorEvolver;
 
 import org.rlcommunity.environment.helicopter.HelicopterState;
 import org.rlcommunity.rlglue.codec.AgentInterface;
@@ -21,19 +21,19 @@ import org.rlcommunity.rlglue.codec.types.Reward_observation_terminal;
 public class EpisodeRunner {
 
     /** The amount of predictors to evolve */
-    private static final int NUM_PREDICTORS = 1;
+    private static final int NUM_PREDICTORS = 20;
     /** The amount of agents to evolve */
-    private static final int NUM_AGENTS = 50;
+    private static final int NUM_AGENTS = 30;
 
     /** The amount of environments tested per agent per generation */
-    private static final int ENVIRONMENTS_PER_EVALUATION = 50;
+    private static final int ENVIRONMENTS_PER_EVALUATION = 10;
     /** The amount of generations to evolve */
     private static final int NUM_GENERATIONS = 100;
     /** The maximum length of an episode */
-    public static final int EPISODE_LENGTH = 1000;
+    public static final int EPISODE_LENGTH = 15;
 
     /** The fitness function to test the predictor with */
-    private static final FitnessFunction PREDICTOR_FITNESS = new RewardFitness();
+    private static final FitnessFunction PREDICTOR_FITNESS = new VarianceFitness();
 
     /** The minimum possible reward after an episode */
     public static final double MIN_REWARD = (-3.0f * HelicopterState.MAX_POS * HelicopterState.MAX_POS + -3.0f
@@ -44,21 +44,21 @@ public class EpisodeRunner {
 
     public static void main(final String[] args) {
 
-        final DiscreteWindPredictorEvolver predictorEvolver = new DiscreteWindPredictorEvolver(NUM_PREDICTORS,
-                PREDICTOR_FITNESS);
+        final StatePredictorEvolver predictorEvolver = new StatePredictorEvolver(NUM_PREDICTORS, PREDICTOR_FITNESS, 20);
         final AgentEvolver agentEvolver = new AgentEvolver(NUM_AGENTS);
 
-        final List<DiscreteWindPredictor> predictors = predictorEvolver.getSpecimens();
+        final List<StatePredictor> predictors = predictorEvolver.getSpecimens();
         final List<ShimonsAgent> agents = agentEvolver.getSpecimens();
-        final List<BaselinePredictor> baselinePredictors = BaselinePredictor.getAllBaselines();
+        final List<StateBaselinePredictor> baselinePredictors = StateBaselinePredictor.getAllBaselines();
 
-        final long lastBaselineReward = 0;
+        double lastBaselineReward = 0;
         for (int generation = 0; generation < NUM_GENERATIONS; generation++) {
 
-            // final long averageBaselineReward = runBaselineTest(baselinePredictors, agents);
-            // System.out.println("Baseline average reward over " + baselinePredictors.size() + " environments: "
-            // + averageBaselineReward + " diff: " + (averageBaselineReward - lastBaselineReward));
-            // lastBaselineReward = averageBaselineReward;
+            final double[] baselineResults = runBaselineTest(baselinePredictors, agents);
+            System.out.print("Baseline: " + baselineResults[0] + " - "
+                    + String.format(Locale.ENGLISH, "%.2f", baselineResults[1]) + "     -----     diff: "
+                    + (baselineResults[0] - lastBaselineReward));
+            lastBaselineReward = baselineResults[0];
 
             // Performs tests for each agent and each predictor
             for (final ShimonsAgent agent : agents) {
@@ -70,25 +70,13 @@ public class EpisodeRunner {
             }
 
             // Print scores
-            System.out.println(Math.round(agentEvolver.getAverageFitness()) + " - "
+            System.out.println("              Training: " + Math.round(agentEvolver.getAverageFitness()) + " - "
                     + String.format(Locale.ENGLISH, "%.2f", agentEvolver.getAverageNumSteps()) + "     -----     "
                     + Math.round(predictorEvolver.getAverageFitness()));
 
             // Evolve the specimens
-            // predictorEvolver.evolve();
+            predictorEvolver.evolve();
             agentEvolver.evolve();
-
-            System.out.print("                                        ");
-            final double[] distributionWeights = new double[10];
-            for (final DiscreteWindPredictor predictor : predictors) {
-                for (int i = 0; i < 10; ++i) {
-                    distributionWeights[i] += predictor.mDistributionWeights[i];
-                }
-            }
-            for (int i = 0; i < 10; ++i) {
-                System.out.print(Math.round(distributionWeights[i] * 10) / (10.0 * NUM_PREDICTORS) + "  ");
-            }
-            System.out.println();
 
             // Clean up the specimens
             for (final Predictor predictor : predictors) {
@@ -110,32 +98,43 @@ public class EpisodeRunner {
      *            The agents
      * @return The average rewards over all agents and baselines
      */
-    private static long runBaselineTest(final List<BaselinePredictor> baselinePredictors,
+    private static double[] runBaselineTest(final List<StateBaselinePredictor> baselinePredictors,
             final List<ShimonsAgent> agents) {
 
         // Performs tests for each agent
         for (final ShimonsAgent agent : agents) {
-            for (final BaselinePredictor predictor : baselinePredictors) {
+            for (final StateBaselinePredictor predictor : baselinePredictors) {
                 for (int i = 0; i < EpisodeRunner.ENVIRONMENTS_PER_EVALUATION; ++i) {
                     runEpisode(predictor, agent);
                 }
             }
         }
 
-        double totalReward = 0;
+        double bestReward = Double.NEGATIVE_INFINITY;
+        double bestSteps = 0;
         for (final ShimonsAgent agent : agents) {
-            totalReward += agent.getAverageReward();
+            if (agent.getAverageReward() > bestReward) {
+                bestReward = agent.getAverageReward();
+                bestSteps = agent.getAverageNumSteps();
+            }
         }
 
         // Clean up the specimens
-        for (final Predictor predictor : baselinePredictors) {
+        for (final StateBaselinePredictor predictor : baselinePredictors) {
+            double rewardSum = 0;
+            for (final double reward : predictor.getEpisodeRewards()) {
+                rewardSum += reward;
+            }
+            // System.out
+            // .println("                                                                                                                      "
+            // + (int) rewardSum / baselinePredictors.size());
             predictor.env_cleanup();
         }
         for (final ShimonsAgent agent : agents) {
             agent.agent_cleanup();
         }
 
-        return Math.round(totalReward / agents.size());
+        return new double[] { Math.round(bestReward), bestSteps };
     }
 
     /**

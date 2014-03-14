@@ -47,4 +47,26 @@ public class AgentEvolver extends Evolver<ShimonsAgent> {
         return numSteps / getSpecimens().size();
     }
 
+    public ShimonsAgent cloneBestAgent() {
+        // Find the best agent
+        Double[] bestWeights = null;
+        double bestReward = Double.NEGATIVE_INFINITY;
+        for (final ShimonsAgent agent : getSpecimens()) {
+            final double agentReward = agent.getAverageReward();
+            if (agentReward > bestReward) {
+                bestReward = agentReward;
+                bestWeights = agent.getWeights();
+            }
+        }
+
+        // Clone the agent and return it
+        final double[] primitiveWeights = new double[bestWeights.length];
+        for (int i = 0; i < bestWeights.length; ++i) {
+            primitiveWeights[i] = bestWeights[i];
+        }
+        final ShimonsAgent bestAgent = new ShimonsAgent();
+        bestAgent.setWeights(primitiveWeights);
+        return bestAgent;
+    }
+
 }

@@ -104,12 +104,12 @@ public abstract class Evolver<T extends ChromosomeSpecimen> {
     /**
      * @return The average fitness of the specimens determined by previously executed tests.
      */
-    public double getAverageFitness() {
+    public long getAverageFitness() {
         double fitness = 0;
         for (final T specimen : mSpecimens) {
             fitness += specimen.getFitness();
         }
-        return fitness / mSpecimens.size();
+        return Math.round(fitness / mSpecimens.size());
     }
 
     public void refill() {

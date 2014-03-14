@@ -21,7 +21,6 @@ public class EpisodeRunner {
 
     public static final int NUM_PREDICTORS = 30;
     public static final int NUM_AGENTS = 30;
-
     public static final int ENVIRONMENTS_PER_EVALUATION = 10;
     public static final int NUM_GENERATIONS = 100;
     public static final int EPISODE_LENGTH = 15;
@@ -33,6 +32,8 @@ public class EpisodeRunner {
     public static final boolean CORRECT_BIAS = true;
 
     private static final FitnessFunction PREDICTOR_FITNESS = new VarianceFitness();
+
+    public static final boolean PRINT_FOR_MATLAB = true;
 
     public static void main(final String[] args) {
 
@@ -57,19 +58,26 @@ public class EpisodeRunner {
                 }
             }
 
-            // Print scores
-            System.out.print(Math.round(agentEvolver.getAverageFitness()) + " - "
-                    + String.format(Locale.ENGLISH, "%.2f", agentEvolver.getAverageNumSteps()) + "     -----     "
-                    + Math.round(predictorEvolver.getAverageFitness()));
-
             // Test the best agent against the baseline
             final ShimonsAgent bestAgent = agentEvolver.cloneBestAgent();
             for (int i = 0; i < baselinePredictor.getTotalNumberOfBaselines(); ++i) {
                 runEpisode(baselinePredictor, bestAgent);
             }
-            System.out.println("          " + Math.round(bestAgent.getAverageReward()) + " - "
-                    + String.format(Locale.ENGLISH, "%.2f", bestAgent.getAverageNumSteps()));
-            baselinePredictor.env_cleanup();
+
+            // Print scores
+            final long agentFitness = agentEvolver.getAverageFitness();
+            final String steps = formatSteps(agentEvolver.getAverageNumSteps());
+            final long predictorFitness = predictorEvolver.getAverageFitness();
+            final long baselineAgentFitness = Math.round(bestAgent.getAverageReward());
+            final String baselineSteps = formatSteps(bestAgent.getAverageNumSteps());
+
+            if (PRINT_FOR_MATLAB) {
+                System.out.println(agentFitness + " " + steps + " " + predictorFitness + " " + baselineAgentFitness
+                        + " " + baselineSteps + ";");
+            } else {
+                System.out.println(agentFitness + "  --  " + steps + "  --  " + predictorFitness + "          "
+                        + baselineAgentFitness + "  --  " + baselineSteps);
+            }
 
             // Evolve the specimens
             agentEvolver.evolve();
@@ -86,6 +94,7 @@ public class EpisodeRunner {
             for (final Predictor predictor : predictors) {
                 predictor.env_cleanup();
             }
+            baselinePredictor.env_cleanup();
         }
 
     }
@@ -115,5 +124,9 @@ public class EpisodeRunner {
             action = agent.agent_step(rewObs.getReward(), rewObs.getObservation());
         }
         agent.agent_end(rewObs.getReward());
+    }
+
+    private static String formatSteps(final double numSteps) {
+        return String.format(Locale.ENGLISH, "%.2f", numSteps);
     }
 }

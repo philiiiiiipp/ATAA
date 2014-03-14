@@ -1,70 +1,135 @@
 package nl.uva.ataa.environment;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.LinkedList;
 import java.util.List;
 
-public class BaselinePredictor extends Predictor {
+import nl.uva.ataa.environment.fitness.FitnessFunction;
+import nl.uva.ataa.utilities.Utilities;
 
-    public enum Baseline {
-        ONE(new double[] { 0.693851, 0.115374, 0.669592, 0.588185, 0.853936, 0.252569, 0.757596, 0.367433 }),
-        TWO(new double[] { 0.720038, 0.635304, 0.044392, 0.648565, 0.132414, 0.259877, 0.086958, 0.813711 }),
-        THREE(new double[] { 0.724593, 0.666699, 0.311691, 0.786064, 0.600669, 0.021126, 0.236896, 0.562895 }),
-        FOUR(new double[] { 0.607132, 0.442880, 0.360980, 0.167207, 0.081301, 0.742238, 0.002850, 0.550981 }),
-        FIVE(new double[] { 0.949278, 0.276789, 0.115042, 0.270776, 0.268197, 0.861445, 0.942433, 0.971455 }),
-        SIX(new double[] { 0.550625, 0.867898, 0.916801, 0.643898, 0.211139, 0.425095, 0.758741, 0.897585 }),
-        SEVEN(new double[] { 0.116730, 0.373797, 0.113577, 0.766653, 0.428122, 0.021471, 0.995174, 0.281151 }),
-        EIGHT(new double[] { 0.680743, 0.024624, 0.224401, 0.606206, 0.739881, 0.397792, 0.043179, 0.897237 }),
-        NINE(new double[] { 0.397997, 0.791233, 0.736065, 0.738457, 0.989597, 0.169351, 0.532904, 0.149639 }),
-        TEN(new double[] { 0.187150, 0.631497, 0.268372, 0.896376, 0.190854, 0.726746, 0.766254, 0.929489 });
+public class BaselinePredictor extends StatePredictor {
 
-        private double[] mBaseline;
+    /** The file to save the states to */
+    private final static String STATE_FILE = "helicopter_start_states.dat";
 
-        private Baseline(final double[] baseline) {
-            mBaseline = baseline;
-        }
+    /** The amount of total baselines to test against */
+    private final int mBaselineAmount;
 
-        public double getIndex(final int index) {
-            return mBaseline[index];
-        }
-    }
+    /** All start states */
+    private final List<double[]> mStartStates;
 
-    /** The baseline of this baselinepredictor */
-    private final Baseline mBaselineNumber;
+    /** The currently used state */
+    private int mCurrentState = 0;
 
     /**
      * Construct a baseline predictor with the given baseline
      * 
-     * @param baselineNumber
-     *            The baseline
+     * @param numParamValues
+     *            The amount of discrete values per parameters
+     * @param fitnessFunction
+     *            The fitness function used to evolve the predictor
      */
-    public BaselinePredictor(final Baseline baselineNumber) {
-        mBaselineNumber = baselineNumber;
-    }
-
-    @Override
-    protected double getSample(final int index) {
-        return mBaselineNumber.getIndex(index);
+    public BaselinePredictor(final int numParamValues, final int baselineAmount, final FitnessFunction fitnessFunction) {
+        super(numParamValues, fitnessFunction);
+        mBaselineAmount = baselineAmount;
+        mStartStates = getStartStates(mBaselineAmount, numParamValues);
     }
 
     /**
-     * Get a list of all baseline predictors
+     * Get all start states. If no start states where already generated, generate new start states
      * 
-     * @return A list of all baseline predictors
+     * @param stateAmount
+     *            The amount of start states to generate
+     * @param numParamValues
+     *            The number of discrete values a parameter can have
+     * @return A list of all start states
      */
-    public static List<BaselinePredictor> getAllBaselines() {
-        List<BaselinePredictor> baselines = new ArrayList<>();
+    @SuppressWarnings("unchecked")
+    private static List<double[]> getStartStates(final int stateAmount, final int numParamValues) {
+        List<double[]> startStates = null;
 
-        baselines.add(new BaselinePredictor(Baseline.ONE));
-        baselines.add(new BaselinePredictor(Baseline.TWO));
-        baselines.add(new BaselinePredictor(Baseline.THREE));
-        baselines.add(new BaselinePredictor(Baseline.FOUR));
-        baselines.add(new BaselinePredictor(Baseline.FIVE));
-        baselines.add(new BaselinePredictor(Baseline.SIX));
-        baselines.add(new BaselinePredictor(Baseline.SEVEN));
-        baselines.add(new BaselinePredictor(Baseline.EIGHT));
-        baselines.add(new BaselinePredictor(Baseline.NINE));
-        baselines.add(new BaselinePredictor(Baseline.TEN));
+        File f = new File(STATE_FILE);
+        if (f.exists() && f.isFile()) {
 
-        return baselines;
+            try {
+                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));
+                startStates = (List<double[]>) ois.readObject();
+                ois.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else {
+            startStates = generateStartstates(stateAmount, numParamValues);
+        }
+
+        return startStates;
+    }
+
+    /**
+     * Generate the start states with the given parameters and save the to disk
+     * 
+     * @param stateAmount
+     *            The amount of start states to generate
+     * @param numParamValues
+     *            The number of discrete values a parameter can have
+     * @return A list of all generated start states
+     */
+    private static List<double[]> generateStartstates(final int stateAmount, final int numParamValues) {
+        List<double[]> startStates = new LinkedList<>();
+
+        for (int stateNum = 0; stateNum < stateAmount; stateNum++) {
+            final double[] startState = new double[12];
+            for (int i = 0; i < 9; ++i) {
+                final double modifier = MODIFIERS[i / 3];
+                final double sample = Math.floor(Utilities.RNG.nextDouble() * numParamValues) / (numParamValues - 1);
+                startState[i] = sample * (2 - BORDER_RANGE * 2) * modifier - modifier + BORDER_RANGE;
+            }
+            startStates.add(startState);
+        }
+
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(STATE_FILE));
+            oos.writeObject(startStates);
+            oos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return startStates;
+    }
+
+    /**
+     * Get the total number of baselines in this predictor
+     * 
+     * @return The total amount of baselines
+     */
+    public int getTotalNumberOfBaselines() {
+        return mBaselineAmount;
+    }
+
+    @Override
+    public String env_init() {
+
+        setStartState(mStartStates.get(mCurrentState++));
+        return super.env_init() + " BIAS: " + 1;
+    }
+
+    @Override
+    public void env_cleanup() {
+        super.env_cleanup();
+
+        mCurrentState = 0;
     }
 }

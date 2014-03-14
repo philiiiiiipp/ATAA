@@ -20,10 +20,9 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     /** The amount of steps taken */
     private int mNumSteps = 0;
     /** The rewards that the agent has gathered */
-    private double mAccumulatedReward = 0.0;
+    private double mAccumulatedReward = 0;
 
-    private double mEpisodeReward = 0.0;
-    private double mBiasSteps = 0;
+    private double mEpisodeReward = 0;
 
     private double mEpisodeBias = 1;
     private double mTotalBias = 0;
@@ -53,7 +52,8 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     }
 
     /**
-     * Adds a layer to the neural network and adds a bias neuron which connects to every neuron in the new layer.
+     * Adds a layer to the neural network and adds a bias neuron which connects to every neuron in
+     * the new layer.
      * 
      * @param numNeurons
      *            The amount of neurons in the new layer
@@ -223,7 +223,7 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
      * @return The average reward of the agent based on the last series of tests it has performed.
      */
     public double getAverageReward() {
-        return mAccumulatedReward / (mBiasSteps / mNumSteps) / mNumEpisodes;
+        return mAccumulatedReward / mTotalBias;
     }
 
     /**
@@ -256,26 +256,23 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
     @Override
     public Action agent_start(final Observation o) {
         ++mNumSteps;
-        mBiasSteps += 1 / mEpisodeBias;
-        mTotalBias += mEpisodeBias;
 
         return getAction(o);
     }
 
     @Override
     public Action agent_step(final double reward, final Observation o) {
-        mEpisodeReward += reward / mEpisodeBias;
-        mTotalBias += mEpisodeBias;
+        mEpisodeReward += reward;
         ++mNumSteps;
-        mBiasSteps += 1 / mEpisodeBias;
 
         return getAction(o);
     }
 
     @Override
     public void agent_end(final double reward) {
-        mEpisodeReward += reward / mEpisodeBias;
-        mAccumulatedReward += mEpisodeReward;
+        mEpisodeReward += reward;
+        mAccumulatedReward += mEpisodeReward * mEpisodeBias;
+        mTotalBias += mEpisodeBias;
         ++mNumEpisodes;
     }
 
@@ -286,7 +283,6 @@ public abstract class NeuralNetworkAgent implements AgentInterface {
         mNumSteps = 0;
         mTotalBias = 0;
         mEpisodeBias = 1;
-        mBiasSteps = 0;
     }
 
 }

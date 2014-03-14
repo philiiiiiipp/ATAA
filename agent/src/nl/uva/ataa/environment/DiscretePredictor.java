@@ -1,9 +1,11 @@
 package nl.uva.ataa.environment;
 
 import nl.uva.ataa.environment.fitness.FitnessFunction;
+import nl.uva.ataa.utilities.Utilities;
 
 /**
- * A predictor that uses beta destributions to generate the winds within environments. It can be evolved.
+ * A predictor that uses beta destributions to generate the winds within environments. It can be
+ * evolved.
  */
 public class DiscretePredictor extends BetaPredictor {
 
@@ -25,7 +27,9 @@ public class DiscretePredictor extends BetaPredictor {
 
     @Override
     protected double getSample(final int index) {
-        return Math.floor(super.getSample(index) * mNumParamValues) / (mNumParamValues - 1);
+        final double min = Math.floor(Utilities.RNG.nextDouble() * mNumParamValues) / (mNumParamValues - 1);
+        final double max = min + 1.0 / mNumParamValues;
+        return Math.pow(getOccuranceProbability(index, min, max), 1 / mNumParamValues);
     }
 
     protected double getDiscreteProbability(final int index, final double value) {

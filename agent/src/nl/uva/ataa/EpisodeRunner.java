@@ -19,8 +19,8 @@ import org.rlcommunity.rlglue.codec.types.Reward_observation_terminal;
 
 public class EpisodeRunner {
 
-    public static final int NUM_PREDICTORS = 30;
-    public static final int NUM_AGENTS = 30;
+    public static final int NUM_PREDICTORS = 35;
+    public static final int NUM_AGENTS = 35;
     public static final int ENVIRONMENTS_PER_EVALUATION = 10;
     public static final int NUM_GENERATIONS = 100;
     public static final int EPISODE_LENGTH = 15;

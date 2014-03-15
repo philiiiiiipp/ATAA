@@ -18,8 +18,8 @@ public class DiscretePredictor extends BetaPredictor {
     }
 
     protected double getDiscreteProbability(final int index, final double value) {
-        final double min = 0;
-        final double max = value * (mNumParamValues - 1) / mNumParamValues + 1.0 / mNumParamValues;
+        final double min = value * (mNumParamValues - 1) / mNumParamValues;
+        final double max = min + 1.0 / mNumParamValues;
 
         return getOccuranceProbability(index, min, max);
     }

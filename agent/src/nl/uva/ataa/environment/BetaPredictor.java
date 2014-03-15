@@ -47,7 +47,9 @@ public class BetaPredictor extends Predictor implements ChromosomeSpecimen {
     }
 
     protected double getOccuranceProbability(final int index, final double min, final double max) {
-        return mDistributions[index].probability(min, max);
+        final double xMin = mDistributions[index].inverseCumulativeProbability(min);
+        final double xMax = mDistributions[index].inverseCumulativeProbability(max);
+        return xMax - xMin;
     }
 
     public void setWeights(final Double[] weights) {

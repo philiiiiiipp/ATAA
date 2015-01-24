@@ -2,17 +2,17 @@
  * Helicopter Domain for RL-Competition:
  * RLAI's Port of Pieter Abbeel's code submission
  * Copyright (C) 2007, Pieter Abbeel.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -42,7 +42,7 @@ public class HelicopterState {
     static final int qy_idx = 10; // cos(theta/2)] where axis = axis of rotation; theta is amount
     static final int qz_idx = 11; // of rotation around that axis [recall: any rotation can be
     static final int qw_idx = 12; // represented by a single rotation around some axis]
-    static final int state_size = 13; // <---deprecated? XXX
+    static final int state_size = 13; // <---deprecated?
     static final int NUMOBS = state_size - 1; // (qw_idx is not observed)
 
     // Upper bounds on values state variables can take on (required by rl_glue
@@ -152,7 +152,7 @@ public class HelicopterState {
      * Return an Observation object, which is the "error state" (i.e., amount of deviation from the goal state).
      * Observation is the error state in the helicopter's coordinate system so that errors/observations can be mapped
      * more directly to actions.
-     * 
+     *
      * Observation (12 vars) consists of: u, v, w : velocities in helicopter frame xerr, yerr, zerr : position error
      * expressed in frame attached to helicopter [xyz correspond to ned when helicopter is in neutral orientation, level
      * and facing north p, q, r : angular rate of change qx, qy, qz : quaternions representing helicopter's rotation
@@ -333,12 +333,12 @@ public class HelicopterState {
         return Math.sqrt(-2.0f * Math.log(x1)) * Math.cos(2.0f * Math.PI * x2);
     }
 
-    public double rand_minus1_plus1() { // deprecated? XXX
+    public double rand_minus1_plus1() { // deprecated?
         final double x1 = randomNumberGenerator.nextDouble();
         return 2.0f * x1 - 1.0f;
     }
 
-    public double getRandomNumber() { // deprecated? XXX
+    public double getRandomNumber() { // deprecated?
         return randomNumberGenerator.nextDouble();
     }
 
